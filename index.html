@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folgas das Equipes 2025-2026</title>
+    <title>Folgas das Equipes e Feriados 2025-2026</title>
     <style>
         :root {
             --verde: #4CAF50;
             --azul: #2196F3;
             --amarelo: #FFEB3B;
             --vermelho: #F44336;
+            --feriado: #9C27B0;
         }
         
         body {
@@ -63,7 +64,8 @@
         #azul-btn { background-color: var(--azul); }
         #amarelo-btn { background-color: #FFA000; }
         #vermelho-btn { background-color: var(--vermelho); }
-        #all-btn { background-color: #9C27B0; color: white; }
+        #feriados-btn { background-color: var(--feriado); color: white; }
+        #all-btn { background-color: #607D8B; color: white; }
         
         .calendar {
             display: grid;
@@ -123,6 +125,7 @@
         .azul { background-color: var(--azul); }
         .amarelo { background-color: #FFA000; }
         .vermelho { background-color: var(--vermelho); }
+        .feriado { background-color: var(--feriado); color: white; }
         
         .legend {
             display: flex;
@@ -136,12 +139,17 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            font-size: 14px;
         }
         
         .legend-color {
             width: 20px;
             height: 20px;
             border-radius: 4px;
+        }
+        
+        .empty {
+            visibility: hidden;
         }
         
         @media (max-width: 768px) {
@@ -158,11 +166,15 @@
                 padding: 5px;
                 font-size: 12px;
             }
+            
+            .legend-item {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Folgas das Equipes 2025-2026</h1>
+    <h1>Folgas das Equipes e Feriados 2025-2026</h1>
     
     <div class="legend">
         <div class="legend-item">
@@ -181,6 +193,10 @@
             <div class="legend-color" style="background-color: #F44336;"></div>
             <span>Equipe Vermelha</span>
         </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #9C27B0;"></div>
+            <span>Feriado Nacional</span>
+        </div>
     </div>
     
     <div class="controls">
@@ -189,6 +205,7 @@
         <button id="azul-btn" class="team-btn">Azul</button>
         <button id="amarelo-btn" class="team-btn">Amarela</button>
         <button id="vermelho-btn" class="team-btn">Vermelha</button>
+        <button id="feriados-btn">Feriados</button>
         <button id="all-btn">Todas</button>
     </div>
     
@@ -204,12 +221,42 @@
                 vermelho: ['2025-07-31', '2025-08-01']
             };
             
+            // Feriados nacionais brasileiros (2025-2026)
+            const holidays = {
+                '2025-01-01': 'Confraternização Universal',
+                '2025-03-03': 'Carnaval',
+                '2025-03-04': 'Carnaval',
+                '2025-04-18': 'Sexta-feira Santa',
+                '2025-04-21': 'Tiradentes',
+                '2025-05-01': 'Dia do Trabalho',
+                '2025-06-19': 'Corpus Christi',
+                '2025-09-07': 'Independência do Brasil',
+                '2025-10-12': 'Nossa Senhora Aparecida',
+                '2025-11-02': 'Finados',
+                '2025-11-15': 'Proclamação da República',
+                '2025-12-25': 'Natal',
+                
+                '2026-01-01': 'Confraternização Universal',
+                '2026-02-16': 'Carnaval',
+                '2026-02-17': 'Carnaval',
+                '2026-04-03': 'Sexta-feira Santa',
+                '2026-04-21': 'Tiradentes',
+                '2026-05-01': 'Dia do Trabalho',
+                '2026-06-04': 'Corpus Christi',
+                '2026-09-07': 'Independência do Brasil',
+                '2026-10-12': 'Nossa Senhora Aparecida',
+                '2026-11-02': 'Finados',
+                '2026-11-15': 'Proclamação da República',
+                '2026-12-25': 'Natal'
+            };
+            
             // Objeto para armazenar todas as folgas
             let allDaysOff = {
                 verde: [...initialData.verde],
                 azul: [...initialData.azul],
                 amarelo: [...initialData.amarelo],
-                vermelho: [...initialData.vermelho]
+                vermelho: [...initialData.vermelho],
+                feriados: Object.keys(holidays)
             };
             
             // Gerar todas as folgas até o final de 2026
@@ -222,6 +269,7 @@
             const azulBtn = document.getElementById('azul-btn');
             const amareloBtn = document.getElementById('amarelo-btn');
             const vermelhoBtn = document.getElementById('vermelho-btn');
+            const feriadosBtn = document.getElementById('feriados-btn');
             const allBtn = document.getElementById('all-btn');
             
             // Estado atual
@@ -236,6 +284,7 @@
             azulBtn.addEventListener('click', () => filterByTeam('azul'));
             amareloBtn.addEventListener('click', () => filterByTeam('amarelo'));
             vermelhoBtn.addEventListener('click', () => filterByTeam('vermelho'));
+            feriadosBtn.addEventListener('click', () => filterByTeam('feriados'));
             allBtn.addEventListener('click', () => filterByTeam('all'));
             
             // Função para gerar todas as folgas até o final de 2026
@@ -281,10 +330,14 @@
                 
                 const today = new Date();
                 const currentYear = today.getFullYear();
+                const currentMonth = today.getMonth();
                 const years = [currentYear, currentYear + 1];
                 
                 years.forEach(year => {
-                    for (let month = 0; month < 12; month++) {
+                    // Começar do mês atual se for o ano corrente
+                    const startMonth = (year === currentYear) ? currentMonth : 0;
+                    
+                    for (let month = startMonth; month < 12; month++) {
                         const firstDay = new Date(year, month, 1);
                         const lastDay = new Date(year, month + 1, 0);
                         
@@ -329,10 +382,19 @@
                             if (allDaysOff.amarelo.includes(dateStr)) teamsOff.push('amarelo');
                             if (allDaysOff.vermelho.includes(dateStr)) teamsOff.push('vermelho');
                             
+                            // Verificar feriados
+                            let holidayName = holidays[dateStr];
+                            if (holidayName) {
+                                dayEl.classList.add('feriado');
+                                dayEl.setAttribute('title', holidayName);
+                            }
+                            
                             // Aplicar filtro
                             let showDay = false;
                             if (filter === 'all') {
                                 showDay = true;
+                            } else if (filter === 'feriados') {
+                                showDay = holidayName !== undefined;
                             } else {
                                 showDay = teamsOff.includes(filter);
                             }
@@ -350,6 +412,7 @@
                             dayEl.innerHTML = `
                                 <div class="weekday">${weekday}</div>
                                 <div class="day-number">${day}</div>
+                                ${holidayName ? '<div class="holiday-name">'+holidayName+'</div>' : ''}
                             `;
                             
                             daysEl.appendChild(dayEl);
