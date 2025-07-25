@@ -124,11 +124,11 @@
             gap: 5px;
             margin-bottom: 15px;
             padding-bottom: 5px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         
         .tabs::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
         .tab {
@@ -153,11 +153,11 @@
             scroll-snap-type: x mandatory;
             gap: 15px;
             padding-bottom: 15px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         
         .calendar-container::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
         .month {
@@ -263,7 +263,6 @@
             visibility: visible;
         }
         
-        /* Mobile */
         @media (max-width: 600px) {
             h1 {
                 font-size: 1.3rem;
@@ -311,7 +310,6 @@
             }
         }
 
-        /* Animação de transição */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -372,12 +370,15 @@
                 document.body.classList.add('dark-mode');
             }
             
-            // Datas iniciais de folga (6 dias trabalhados + 2 folgas)
-            const initialData = {
-                verde: ['2025-07-25', '2025-07-26'], // Folga 25 e 26/07
-                azul: ['2025-07-27', '2025-07-28'],   // Folga 27 e 28/07
-                amarelo: ['2025-07-29', '2025-07-30'], // Folga 29 e 30/07
-                vermelho: ['2025-07-31', '2025-08-01'] // Folga 31/07 e 01/08
+            // Ordem das equipes: Vermelho → Verde → Azul → Amarelo → Vermelho...
+            const teamOrder = ['vermelho', 'verde', 'azul', 'amarelo'];
+            
+            // Datas iniciais de folga conforme especificado
+            const initialDays = {
+                vermelho: ['2025-07-31', '2025-08-01'], // Vermelho: 31/07 e 01/08
+                verde: ['2025-08-02', '2025-08-03'],    // Verde: 02/08 e 03/08
+                azul: ['2025-08-04', '2025-08-05'],     // Azul: 04/08 e 05/08
+                amarelo: ['2025-08-06', '2025-08-07']    // Amarelo: 06/08 e 07/08
             };
             
             // Feriados nacionais brasileiros (2025-2026)
@@ -411,14 +412,14 @@
             
             // Objeto para armazenar todas as folgas
             let allDaysOff = {
-                verde: [...initialData.verde],
-                azul: [...initialData.azul],
-                amarelo: [...initialData.amarelo],
-                vermelho: [...initialData.vermelho],
+                vermelho: [...initialDays.vermelho],
+                verde: [...initialDays.verde],
+                azul: [...initialDays.azul],
+                amarelo: [...initialDays.amarelo],
                 feriados: Object.keys(holidays)
             };
             
-            // Gerar todas as folgas até o final de 2026 (6 dias trabalhados + 2 folgas)
+            // Gerar todas as folgas até o final de 2026 seguindo o padrão correto
             generateAllDaysOff();
             
             // Elementos do DOM
@@ -467,46 +468,42 @@
                 themeToggle.textContent = '🌞';
             }
             
-            // Função para gerar todas as folgas até o final de 2026 (6 dias trabalhados + 2 folgas)
+            // Função para gerar todas as folgas até o final de 2026 com o padrão correto
             function generateAllDaysOff() {
-                const teams = ['verde', 'azul', 'amarelo', 'vermelho'];
                 const endYear = 2026;
+                let currentTeamIndex = 3; // Começa após o Amarelo (índice 3), próxima será Vermelho (0)
+                let lastDate = new Date('2025-08-07'); // Última folga inicial (Amarelo)
                 
-                // Dias de folga iniciais para cada equipe
-                const initialDays = {
-                    verde: new Date('2025-07-25'),
-                    azul: new Date('2025-07-27'),
-                    amarelo: new Date('2025-07-29'),
-                    vermelho: new Date('2025-07-31')
-                };
+                // Padrão: 6 dias trabalhados + 2 folgas
+                const daysBetween = 8; // 6 trabalhados + 2 folgas
                 
-                teams.forEach(team => {
-                    // Começar a partir da data inicial de cada equipe
-                    let lastDate = new Date(initialDays[team]);
+                // Continuar até o final de 2026
+                while (lastDate.getFullYear() <= endYear) {
+                    // Avançar 6 dias trabalhados para a próxima folga
+                    let nextFolgaStart = new Date(lastDate);
+                    nextFolgaStart.setDate(nextFolgaStart.getDate() + daysBetween - 2);
                     
-                    // Padrão de folgas: 6 dias trabalhados + 2 folgas
-                    const daysBetween = 8; // 6 trabalhados + 2 folgas
+                    // Verificar se ultrapassou o ano limite
+                    if (nextFolgaStart.getFullYear() > endYear) break;
                     
-                    // Continuar até o final de 2026
-                    while (lastDate.getFullYear() <= endYear) {
-                        // Adicionar a data atual como folga
-                        let dateStr = formatDate(lastDate);
-                        if (!allDaysOff[team].includes(dateStr)) {
-                            allDaysOff[team].push(dateStr);
-                        }
-                        
-                        // Adicionar o próximo dia como folga também (2 dias consecutivos)
-                        let nextDate = new Date(lastDate);
-                        nextDate.setDate(nextDate.getDate() + 1);
-                        let nextDateStr = formatDate(nextDate);
-                        if (!allDaysOff[team].includes(nextDateStr)) {
-                            allDaysOff[team].push(nextDateStr);
-                        }
-                        
-                        // Avançar 8 dias (6 trabalhados + 2 folgas) para a próxima folga
-                        lastDate.setDate(lastDate.getDate() + daysBetween);
+                    // Determinar a próxima equipe de folga (ciclo Vermelho → Verde → Azul → Amarelo)
+                    currentTeamIndex = (currentTeamIndex + 1) % teamOrder.length;
+                    const nextTeam = teamOrder[currentTeamIndex];
+                    
+                    // Adicionar 2 dias de folga para a equipe
+                    let folga1 = formatDate(nextFolgaStart);
+                    let folga2 = formatDate(new Date(nextFolgaStart.getTime() + 24 * 60 * 60 * 1000));
+                    
+                    if (!allDaysOff[nextTeam].includes(folga1)) {
+                        allDaysOff[nextTeam].push(folga1);
                     }
-                });
+                    if (!allDaysOff[nextTeam].includes(folga2)) {
+                        allDaysOff[nextTeam].push(folga2);
+                    }
+                    
+                    // Atualizar a última data para a próxima iteração
+                    lastDate = new Date(nextFolgaStart.getTime() + 24 * 60 * 60 * 1000);
+                }
             }
             
             // Função para inicializar o calendário
@@ -595,10 +592,10 @@
                             
                             // Verificar folgas
                             const teamsOff = [];
+                            if (allDaysOff.vermelho.includes(dateStr)) teamsOff.push('vermelho');
                             if (allDaysOff.verde.includes(dateStr)) teamsOff.push('verde');
                             if (allDaysOff.azul.includes(dateStr)) teamsOff.push('azul');
                             if (allDaysOff.amarelo.includes(dateStr)) teamsOff.push('amarelo');
-                            if (allDaysOff.vermelho.includes(dateStr)) teamsOff.push('vermelho');
                             
                             // Verificar feriados
                             let holidayName = holidays[dateStr];
