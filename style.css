@@ -1,0 +1,113 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f5;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 400px;
+  width: 100%;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0 20px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.navegacao-mes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.navegacao-mes button {
+  padding: 5px 10px;
+  font-size: 24px;
+  background: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s;
+}
+
+.navegacao-mes button:hover {
+  background: #0056b3;
+}
+
+#mes-ano {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Tabela */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  user-select: none;
+}
+
+th, td {
+  width: 14.28%;
+  height: 50px;
+  text-align: center;
+  vertical-align: middle;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* Folgas com cores das equipes */
+.folga-verde {
+  background-color: #28a745;
+  color: white;
+  box-shadow: 0 0 8px #28a745aa;
+}
+
+.folga-azul {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 0 8px #007bffaa;
+}
+
+.folga-amarela {
+  background-color: #ffc107;
+  color: #222;
+  box-shadow: 0 0 8px #ffca2caa;
+}
+
+.folga-vermelha {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 0 8px #dc3545aa;
+}
+
+td:not(.folga-verde):not(.folga-azul):not(.folga-amarela):not(.folga-vermelha) {
+  cursor: default;
+}
