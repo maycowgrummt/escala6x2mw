@@ -1,596 +1,154 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folgas das Equipes e Feriados 2025-2026</title>
-    <style>
-        :root {
-            --verde: #4CAF50;
-            --azul: #2196F3;
-            --amarelo: #FFA000;
-            --vermelho: #F44336;
-            --feriado: #9C27B0;
-            
-            /* Cores modo claro */
-            --bg-color: #f9f9f9;
-            --text-color: #333;
-            --card-bg: #ffffff;
-            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            --border-color: #eee;
-            --month-title-color: #2c3e50;
-            --empty-day-color: transparent;
-        }
-
-        /* Modo escuro */
-        .dark-mode {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --card-bg: #2d2d2d;
-            --card-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            --border-color: #444;
-            --month-title-color: #f0f0f0;
-            --empty-day-color: #3a3a3a;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--bg-color);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        h1 {
-            text-align: center;
-            color: var(--month-title-color);
-            margin-bottom: 30px;
-            transition: color 0.3s;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .theme-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            color: var(--text-color);
-            transition: transform 0.3s;
-        }
-        
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        #today {
-            background-color: #2c3e50;
-            color: white;
-        }
-        
-        .team-btn {
-            color: white;
-        }
-        
-        #verde-btn { background-color: var(--verde); }
-        #azul-btn { background-color: var(--azul); }
-        #amarelo-btn { background-color: var(--amarelo); }
-        #vermelho-btn { background-color: var(--vermelho); }
-        #feriados-btn { background-color: var(--feriado); color: white; }
-        #all-btn { background-color: #607D8B; color: white; }
-        
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-        
-        .month {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: var(--card-shadow);
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-        
-        .month-title {
-            text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--month-title-color);
-            transition: color 0.3s, border-color 0.3s;
-        }
-        
-        .days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-        
-        .day {
-            padding: 6px;
-            text-align: center;
-            border-radius: 6px;
-            font-size: 13px;
-            position: relative;
-            min-height: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background-color: var(--card-bg);
-            transition: background-color 0.3s;
-        }
-        
-        .day-number {
-            font-weight: bold;
-        }
-        
-        .weekday {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-        
-        .holiday-name {
-            font-size: 9px;
-            line-height: 1.2;
-            margin-top: 2px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        
-        .today {
-            background-color: #2c3e50 !important;
-            color: white !important;
-            font-weight: bold;
-        }
-        
-        .day-off {
-            color: white;
-            font-weight: bold;
-        }
-        
-        .verde { background-color: var(--verde); }
-        .azul { background-color: var(--azul); }
-        .amarelo { background-color: var(--amarelo); }
-        .vermelho { background-color: var(--vermelho); }
-        .feriado { background-color: var(--feriado); color: white; }
-        
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 13px;
-        }
-        
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-        
-        .empty {
-            background-color: var(--empty-day-color);
-            visibility: visible;
-        }
-        
-        /* Mobile */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            
-            .controls {
-                gap: 6px;
-            }
-            
-            button {
-                padding: 6px 8px;
-                font-size: 12px;
-            }
-            
-            .calendar {
-                grid-template-columns: 1fr;
-            }
-            
-            .month {
-                padding: 10px;
-            }
-            
-            .day {
-                min-height: 35px;
-                padding: 4px;
-                font-size: 12px;
-            }
-            
-            .weekday {
-                font-size: 10px;
-            }
-            
-            .holiday-name {
-                font-size: 8px;
-            }
-            
-            .legend {
-                gap: 8px;
-            }
-            
-            .legend-item {
-                font-size: 11px;
-            }
-            
-            .legend-color {
-                width: 12px;
-                height: 12px;
-            }
-        }
-
-        /* Animação de transição */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .month {
-            animation: fadeIn 0.3s ease-out;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendário de Folgas 2025-2026</title>
+  <style>
+    :root {
+      --verde: #4CAF50;
+      --azul: #2196F3;
+      --amarelo: #FFA000;
+      --vermelho: #F44336;
+      --feriado: #9C27B0;
+      --bg: #f9f9f9;
+      --text: #333;
+      --card: #fff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: sans-serif;
+      margin: 0;
+      padding: 10px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+    .tabs button {
+      padding: 8px 12px;
+      border: none;
+      background: #ccc;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .tabs button.active {
+      background: #607D8B;
+      color: white;
+    }
+    .month-container {
+      display: none;
+    }
+    .month-container.active {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .day {
+      padding: 10px;
+      background: var(--card);
+      border-radius: 4px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .verde { background: var(--verde); color: white; }
+    .azul { background: var(--azul); color: white; }
+    .amarelo { background: var(--amarelo); color: black; }
+    .vermelho { background: var(--vermelho); color: white; }
+    .feriado { background: var(--feriado); color: white; font-size: 10px; }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Folgas das Equipes e Feriados 2025-2026</h1>
-        <button class="theme-toggle" id="themeToggle">🌓</button>
-    </div>
-    
-    <div class="legend">
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #4CAF50;"></div>
-            <span>Verde</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #2196F3;"></div>
-            <span>Azul</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #FFA000;"></div>
-            <span>Amarela</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #F44336;"></div>
-            <span>Vermelha</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: #9C27B0;"></div>
-            <span>Feriado</span>
-        </div>
-    </div>
-    
-    <div class="controls">
-        <button id="today">Hoje</button>
-        <button id="verde-btn" class="team-btn">Verde</button>
-        <button id="azul-btn" class="team-btn">Azul</button>
-        <button id="amarelo-btn" class="team-btn">Amarela</button>
-        <button id="vermelho-btn" class="team-btn">Vermelha</button>
-        <button id="feriados-btn">Feriados</button>
-        <button id="all-btn">Todas</button>
-    </div>
-    
-    <div class="calendar" id="calendar"></div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar preferência de tema do usuário
-            const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDarkMode) {
-                document.body.classList.add('dark-mode');
+  <h1>Folgas das Equipes 2025-2026</h1>
+  <div class="tabs" id="monthTabs"></div>
+  <div id="calendar"></div>
+
+  <script>
+    const equipes = ['verde', 'azul', 'amarelo', 'vermelho'];
+    const feriados = {
+      '2025-01-01': 'Ano Novo', '2025-04-21': 'Tiradentes', '2025-12-25': 'Natal',
+      '2026-01-01': 'Ano Novo', '2026-04-21': 'Tiradentes', '2026-12-25': 'Natal'
+    };
+
+    const folgas = {
+      verde: ['2025-07-25'],
+      azul: ['2025-07-27'],
+      amarelo: ['2025-07-29'],
+      vermelho: ['2025-07-31']
+    };
+
+    const allFolgas = { verde: [], azul: [], amarelo: [], vermelho: [], feriado: Object.keys(feriados) };
+
+    function generateFolgas() {
+      equipes.forEach(cor => {
+        let current = new Date(folgas[cor][0]);
+        while (current.getFullYear() <= 2026) {
+          const d1 = new Date(current);
+          const d2 = new Date(current); d2.setDate(d2.getDate() + 1);
+          allFolgas[cor].push(format(d1), format(d2));
+          current.setDate(current.getDate() + 8); // 6 trabalho + 2 folga = 8
+        }
+      });
+    }
+
+    function format(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function createCalendar() {
+      const calendar = document.getElementById('calendar');
+      const tabs = document.getElementById('monthTabs');
+      for (let y = 2025; y <= 2026; y++) {
+        for (let m = 0; m < 12; m++) {
+          const date = new Date(y, m, 1);
+          const label = date.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+          const monthId = `${y}-${String(m+1).padStart(2, '0')}`;
+
+          const btn = document.createElement('button');
+          btn.textContent = label;
+          btn.onclick = () => {
+            document.querySelectorAll('.month-container').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(monthId).classList.add('active');
+            btn.classList.add('active');
+          }
+          tabs.appendChild(btn);
+
+          const grid = document.createElement('div');
+          grid.className = 'month-container';
+          grid.id = monthId;
+          const lastDay = new Date(y, m + 1, 0).getDate();
+          for (let d = 1; d <= lastDay; d++) {
+            const dt = new Date(y, m, d);
+            const str = format(dt);
+            const el = document.createElement('div');
+            el.className = 'day';
+            el.textContent = d;
+            for (let cor of equipes) {
+              if (allFolgas[cor].includes(str)) el.classList.add(cor);
             }
-            
-            // Dados iniciais das folgas
-            const initialData = {
-                verde: ['2025-07-25', '2025-07-26'],
-                azul: ['2025-07-27', '2025-07-28'],
-                amarelo: ['2025-07-29', '2025-07-30'],
-                vermelho: ['2025-07-31', '2025-08-01']
-            };
-            
-            // Feriados nacionais brasileiros (2025-2026)
-            const holidays = {
-                '2025-01-01': 'Confraternização Universal',
-                '2025-03-03': 'Carnaval',
-                '2025-03-04': 'Carnaval',
-                '2025-04-18': 'Sexta-feira Santa',
-                '2025-04-21': 'Tiradentes',
-                '2025-05-01': 'Dia do Trabalho',
-                '2025-06-19': 'Corpus Christi',
-                '2025-09-07': 'Independência do Brasil',
-                '2025-10-12': 'Nossa Senhora Aparecida',
-                '2025-11-02': 'Finados',
-                '2025-11-15': 'Proclamação da República',
-                '2025-12-25': 'Natal',
-                
-                '2026-01-01': 'Confraternização Universal',
-                '2026-02-16': 'Carnaval',
-                '2026-02-17': 'Carnaval',
-                '2026-04-03': 'Sexta-feira Santa',
-                '2026-04-21': 'Tiradentes',
-                '2026-05-01': 'Dia do Trabalho',
-                '2026-06-04': 'Corpus Christi',
-                '2026-09-07': 'Independência do Brasil',
-                '2026-10-12': 'Nossa Senhora Aparecida',
-                '2026-11-02': 'Finados',
-                '2026-11-15': 'Proclamação da República',
-                '2026-12-25': 'Natal'
-            };
-            
-            // Objeto para armazenar todas as folgas
-            let allDaysOff = {
-                verde: [...initialData.verde],
-                azul: [...initialData.azul],
-                amarelo: [...initialData.amarelo],
-                vermelho: [...initialData.vermelho],
-                feriados: Object.keys(holidays)
-            };
-            
-            // Gerar todas as folgas até o final de 2026
-            generateAllDaysOff();
-            
-            // Elementos do DOM
-            const calendarEl = document.getElementById('calendar');
-            const themeToggle = document.getElementById('themeToggle');
-            const todayBtn = document.getElementById('today');
-            const verdeBtn = document.getElementById('verde-btn');
-            const azulBtn = document.getElementById('azul-btn');
-            const amareloBtn = document.getElementById('amarelo-btn');
-            const vermelhoBtn = document.getElementById('vermelho-btn');
-            const feriadosBtn = document.getElementById('feriados-btn');
-            const allBtn = document.getElementById('all-btn');
-            
-            // Estado atual
-            let currentFilter = 'all';
-            
-            // Inicializar o calendário
-            renderCalendar();
-            
-            // Event listeners
-            themeToggle.addEventListener('click', toggleTheme);
-            todayBtn.addEventListener('click', scrollToToday);
-            verdeBtn.addEventListener('click', () => filterByTeam('verde'));
-            azulBtn.addEventListener('click', () => filterByTeam('azul'));
-            amareloBtn.addEventListener('click', () => filterByTeam('amarelo'));
-            vermelhoBtn.addEventListener('click', () => filterByTeam('vermelho'));
-            feriadosBtn.addEventListener('click', () => filterByTeam('feriados'));
-            allBtn.addEventListener('click', () => filterByTeam('all'));
-            
-            // Função para alternar entre temas
-            function toggleTheme() {
-                document.body.classList.toggle('dark-mode');
-                const isDark = document.body.classList.contains('dark-mode');
-                themeToggle.textContent = isDark ? '🌞' : '🌓';
-                
-                // Salvar preferência no localStorage
-                localStorage.setItem('darkMode', isDark);
+            if (feriados[str]) {
+              el.classList.add('feriado');
+              el.innerHTML += `<br>${feriados[str]}`;
             }
-            
-            // Verificar tema salvo
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                themeToggle.textContent = '🌞';
-            }
-            
-            // Função para gerar todas as folgas até o final de 2026
-            function generateAllDaysOff() {
-                const teams = ['verde', 'azul', 'amarelo', 'vermelho'];
-                const endYear = 2026;
-                
-                teams.forEach(team => {
-                    // Começar a partir da última data conhecida
-                    let lastDateStr = allDaysOff[team][allDaysOff[team].length - 1];
-                    let lastDate = new Date(lastDateStr);
-                    
-                    // Padrão de folgas: 12 dias após a última folga
-                    const daysBetween = 12;
-                    
-                    // Continuar até o final de 2026
-                    while (lastDate.getFullYear() <= endYear) {
-                        // Adicionar 12 dias para obter a próxima folga
-                        let nextDate = new Date(lastDate);
-                        nextDate.setDate(nextDate.getDate() + daysBetween);
-                        
-                        // Verificar se ultrapassou o ano limite
-                        if (nextDate.getFullYear() > endYear) break;
-                        
-                        // Adicionar 2 dias de folga (o dia calculado e o seguinte)
-                        let nextDateStr = formatDate(nextDate);
-                        allDaysOff[team].push(nextDateStr);
-                        
-                        let nextDate2 = new Date(nextDate);
-                        nextDate2.setDate(nextDate2.getDate() + 1);
-                        let nextDateStr2 = formatDate(nextDate2);
-                        allDaysOff[team].push(nextDateStr2);
-                        
-                        // Atualizar a última data para a próxima iteração
-                        lastDate = new Date(nextDate2);
-                    }
-                });
-            }
-            
-            // Função para renderizar o calendário
-            function renderCalendar(filter = 'all') {
-                calendarEl.innerHTML = '';
-                
-                const today = new Date();
-                const currentYear = today.getFullYear();
-                const currentMonth = today.getMonth();
-                const years = [currentYear, currentYear + 1];
-                
-                years.forEach(year => {
-                    // Começar do mês atual se for o ano corrente
-                    const startMonth = (year === currentYear) ? currentMonth : 0;
-                    
-                    for (let month = startMonth; month < 12; month++) {
-                        const firstDay = new Date(year, month, 1);
-                        const lastDay = new Date(year, month + 1, 0);
-                        
-                        const monthName = firstDay.toLocaleString('pt-BR', { month: 'long' });
-                        const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-                        
-                        const monthEl = document.createElement('div');
-                        monthEl.className = 'month';
-                        monthEl.innerHTML = `<h2 class="month-title">${capitalizedMonthName} ${year}</h2><div class="days" id="days-${year}-${month}"></div>`;
-                        
-                        const daysEl = monthEl.querySelector('.days');
-                        
-                        // Adicionar dias vazios no início se o mês não começar na segunda
-                        const firstDayOfWeek = firstDay.getDay();
-                        const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Ajuste para semana começar na segunda
-                        
-                        for (let i = 0; i < offset; i++) {
-                            const emptyDay = document.createElement('div');
-                            emptyDay.className = 'day empty';
-                            daysEl.appendChild(emptyDay);
-                        }
-                        
-                        // Adicionar os dias do mês
-                        for (let day = 1; day <= lastDay.getDate(); day++) {
-                            const date = new Date(year, month, day);
-                            const dateStr = formatDate(date);
-                            const weekday = date.toLocaleString('pt-BR', { weekday: 'short' });
-                            
-                            const dayEl = document.createElement('div');
-                            dayEl.className = 'day';
-                            dayEl.id = `day-${dateStr}`;
-                            
-                            // Verificar se é hoje
-                            if (date.toDateString() === today.toDateString()) {
-                                dayEl.classList.add('today');
-                            }
-                            
-                            // Verificar folgas
-                            const teamsOff = [];
-                            if (allDaysOff.verde.includes(dateStr)) teamsOff.push('verde');
-                            if (allDaysOff.azul.includes(dateStr)) teamsOff.push('azul');
-                            if (allDaysOff.amarelo.includes(dateStr)) teamsOff.push('amarelo');
-                            if (allDaysOff.vermelho.includes(dateStr)) teamsOff.push('vermelho');
-                            
-                            // Verificar feriados
-                            let holidayName = holidays[dateStr];
-                            if (holidayName) {
-                                dayEl.classList.add('feriado');
-                                dayEl.setAttribute('title', holidayName);
-                            }
-                            
-                            // Aplicar filtro
-                            let showDay = false;
-                            if (filter === 'all') {
-                                showDay = true;
-                            } else if (filter === 'feriados') {
-                                showDay = holidayName !== undefined;
-                            } else {
-                                showDay = teamsOff.includes(filter);
-                            }
-                            
-                            if (!showDay) {
-                                dayEl.style.display = 'none';
-                            }
-                            
-                            // Adicionar classes de folga
-                            teamsOff.forEach(team => {
-                                dayEl.classList.add(team);
-                                dayEl.classList.add('day-off');
-                            });
-                            
-                            dayEl.innerHTML = `
-                                <div class="weekday">${weekday}</div>
-                                <div class="day-number">${day}</div>
-                                ${holidayName ? '<div class="holiday-name">'+holidayName+'</div>' : ''}
-                            `;
-                            
-                            daysEl.appendChild(dayEl);
-                        }
-                        
-                        calendarEl.appendChild(monthEl);
-                    }
-                });
-            }
-            
-            // Função para filtrar por equipe
-            function filterByTeam(team) {
-                currentFilter = team;
-                renderCalendar(team);
-            }
-            
-            // Função para rolar até o dia atual
-            function scrollToToday() {
-                const today = new Date();
-                const dateStr = formatDate(today);
-                const dayEl = document.getElementById(`day-${dateStr}`);
-                
-                if (dayEl) {
-                    dayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // Destaque temporário
-                    dayEl.style.transform = 'scale(1.1)';
-                    dayEl.style.transition = 'transform 0.3s';
-                    setTimeout(() => {
-                        dayEl.style.transform = 'scale(1)';
-                    }, 1000);
-                }
-            }
-            
-            // Função auxiliar para formatar data como YYYY-MM-DD
-            function formatDate(date) {
-                const d = new Date(date);
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-        });
-    </script>
+            grid.appendChild(el);
+          }
+          calendar.appendChild(grid);
+        }
+      }
+      tabs.firstChild.click();
+    }
+
+    generateFolgas();
+    createCalendar();
+  </script>
 </body>
 </html>
