@@ -1,39 +1,61 @@
-const calendarEl = document.getElementById("calendar");
+const calendar = document.getElementById("calendar");
 
-const startYear = 2025;
-const endYear = 2026;
+const cores = ["verde", "azul", "amarela", "vermelha"];
+const datasFolgaIniciais = {
+  verde: new Date("2025-07-25"),
+  azul: new Date("2025-07-27"),
+  amarela: new Date("2025-07-29"),
+  vermelha: new Date("2025-07-31")
+};
 
-for (let year = startYear; year <= endYear; year++) {
-  for (let month = 0; month < 12; month++) {
-    const monthDiv = document.createElement("div");
-    monthDiv.className = "month";
+function gerarFolgas(cor, inicio, fim) {
+  const folgas = [];
+  let data = new Date(inicio);
 
-    const monthName = new Date(year, month).toLocaleString("default", { month: "long" });
-    monthDiv.innerHTML = `<h2>${monthName.toUpperCase()} ${year}</h2>`;
+  while (data <= fim) {
+    folgas.push(new Date(data));
+    data.setDate(data.getDate() + 1);
+    folgas.push(new Date(data));
+    data.setDate(data.getDate() + 6);
+  }
 
-    const daysDiv = document.createElement("div");
-    daysDiv.className = "days";
+  return folgas;
+}
 
-    const totalDays = new Date(year, month + 1, 0).getDate();
+function gerarCalendario(ano) {
+  calendar.innerHTML = "";
+  const inicio = new Date(`${ano}-01-01`);
+  const fim = new Date(`${ano}-12-31`);
 
-    for (let day = 1; day <= totalDays; day++) {
-      const date = new Date(year, month, day);
-      const dateStr = date.toISOString().split("T")[0];
+  const folgasPorCor = {};
+  for (const cor of cores) {
+    folgasPorCor[cor] = gerarFolgas(cor, datasFolgaIniciais[cor], fim);
+  }
 
-      const dayDiv = document.createElement("div");
-      dayDiv.className = "day";
-      dayDiv.innerText = day;
+  let dataAtual = new Date(inicio);
+  while (dataAtual <= fim) {
+    const dia = dataAtual.getDate();
+    const mes = dataAtual.getMonth() + 1;
+    const ano = dataAtual.getFullYear();
+    const div = document.createElement("div");
+    div.className = "day";
+    div.textContent = `${dia}/${mes}`;
 
-      for (const cor in folgas) {
-        if (folgas[cor].includes(dateStr)) {
-          dayDiv.classList.add(`feriado-${cor}`);
-        }
+    for (const cor of cores) {
+      if (folgasPorCor[cor].some(f => f.toDateString() === dataAtual.toDateString())) {
+        div.classList.add(`folga-${cor}`);
       }
-
-      daysDiv.appendChild(dayDiv);
     }
 
-    monthDiv.appendChild(daysDiv);
-    calendarEl.appendChild(monthDiv);
+    calendar.appendChild(div);
+    dataAtual.setDate(dataAtual.getDate() + 1);
   }
 }
+
+gerarCalendario(2025);
+
+document.body.insertAdjacentHTML("afterbegin", `<button class="toggle-theme">Alternar tema</button>`);
+
+document.querySelector(".toggle-theme").addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+});
