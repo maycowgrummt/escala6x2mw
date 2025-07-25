@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendário de Folgas e Feriados 2025-2026</title>
+    <title>Calendário de Folgas 2025-2026</title>
     <style>
         :root {
             --verde: #4CAF50;
@@ -14,6 +14,7 @@
             --text-color: #333;
             --card-bg: #ffffff;
             --border-color: #eee;
+            --filter-active: #2c3e50;
         }
 
         body {
@@ -30,6 +31,34 @@
             text-align: center;
             color: #2c3e50;
         }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--filter-active);
+            color: white;
+        }
+
+        #all-btn { background-color: #607D8B; color: white; }
+        #verde-btn { background-color: var(--verde); color: white; }
+        #azul-btn { background-color: var(--azul); color: white; }
+        #amarelo-btn { background-color: var(--amarelo); color: white; }
+        #vermelho-btn { background-color: var(--vermelho); color: white; }
 
         .calendar-grid {
             display: grid;
@@ -50,6 +79,7 @@
             min-height: 60px;
             padding: 5px;
             position: relative;
+            background-color: var(--card-bg);
         }
 
         .day-number {
@@ -92,9 +122,22 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
+        .hidden {
+            display: none;
+        }
+
         @media (max-width: 600px) {
             .calendar-day {
                 min-height: 50px;
+                font-size: 0.9em;
+            }
+            
+            .controls {
+                gap: 5px;
+            }
+            
+            .filter-btn {
+                padding: 6px 12px;
                 font-size: 0.9em;
             }
         }
@@ -102,6 +145,14 @@
 </head>
 <body>
     <h1>Calendário de Folgas 2025-2026</h1>
+
+    <div class="controls">
+        <button id="all-btn" class="filter-btn active">Todas</button>
+        <button id="verde-btn" class="filter-btn">Verde</button>
+        <button id="azul-btn" class="filter-btn">Azul</button>
+        <button id="amarelo-btn" class="filter-btn">Amarela</button>
+        <button id="vermelho-btn" class="filter-btn">Vermelha</button>
+    </div>
 
     <div id="calendar-container">
         <!-- Os meses serão gerados dinamicamente via JavaScript -->
@@ -142,10 +193,8 @@
                         {day: 16, name: 'Carnaval'},
                         {day: 17, name: 'Carnaval'}
                     ],
-                    '04': [
-                        {day: 3, name: 'Sexta-feira Santa'},
-                        {day: 21, name: 'Tiradentes'}
-                    ],
+                    '03': [{day: 29, name: 'Sexta-feira Santa'}],
+                    '04': [{day: 21, name: 'Tiradentes'}],
                     '05': [{day: 1, name: 'Dia do Trabalho'}],
                     '06': [{day: 4, name: 'Corpus Christi'}],
                     '07': [{day: 8, name: 'Aniversário de Curitiba'}],
@@ -163,69 +212,92 @@
                 }
             };
 
-            // Padrão de folgas fixo conforme especificado
-            const daysOff = {
-                '2025-07': {
-                    25: 'verde',
-                    26: 'verde',
-                    27: 'azul',
-                    28: 'azul',
-                    29: 'amarelo',
-                    30: 'amarelo',
-                    31: 'vermelho'
-                },
-                '2025-08': {
-                    1: 'vermelho',
-                    2: 'verde',
-                    3: 'verde',
-                    4: 'azul',
-                    5: 'azul',
-                    6: 'amarelo',
-                    7: 'amarelo',
-                    8: 'vermelho',
-                    9: 'vermelho',
-                    10: 'verde',
-                    11: 'verde',
-                    12: 'azul',
-                    13: 'azul',
-                    14: 'amarelo',
-                    15: 'amarelo',
-                    16: 'vermelho',
-                    17: 'vermelho',
-                    18: 'verde',
-                    19: 'verde',
-                    20: 'azul',
-                    21: 'azul',
-                    22: 'amarelo',
-                    23: 'amarelo',
-                    24: 'vermelho',
-                    25: 'vermelho',
-                    26: 'verde',
-                    27: 'verde',
-                    28: 'azul',
-                    29: 'azul',
-                    30: 'amarelo'
-                },
-                // Padrão continua para os demais meses...
-            };
+            // Gera o padrão de folgas automaticamente
+            function generateDaysOffPattern() {
+                const pattern = {};
+                const startDate = new Date('2025-07-25');
+                const endDate = new Date('2026-12-31');
+                const teams = ['verde', 'azul', 'amarelo', 'vermelho'];
+                let currentTeamIndex = 0;
+                let currentDate = new Date(startDate);
+                
+                // Folgas iniciais pré-definidas
+                const initialFolgas = {
+                    '2025-07-25': 'verde',
+                    '2025-07-26': 'verde',
+                    '2025-07-27': 'azul',
+                    '2025-07-28': 'azul',
+                    '2025-07-29': 'amarelo',
+                    '2025-07-30': 'amarelo',
+                    '2025-07-31': 'vermelho',
+                    '2025-08-01': 'vermelho'
+                };
+                
+                // Adiciona folgas iniciais
+                Object.keys(initialFolgas).forEach(date => {
+                    const [year, month, day] = date.split('-');
+                    if (!pattern[year]) pattern[year] = {};
+                    if (!pattern[year][month]) pattern[year][month] = {};
+                    pattern[year][month][parseInt(day)] = initialFolgas[date];
+                });
+                
+                currentDate = new Date('2025-08-02');
+                
+                // Gera o padrão cíclico
+                while (currentDate <= endDate) {
+                    currentTeamIndex = (currentTeamIndex + 1) % teams.length;
+                    const team = teams[currentTeamIndex];
+                    
+                    // Adiciona 2 dias de folga
+                    for (let i = 0; i < 2; i++) {
+                        const year = currentDate.getFullYear();
+                        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                        const day = currentDate.getDate();
+                        
+                        if (!pattern[year]) pattern[year] = {};
+                        if (!pattern[year][month]) pattern[year][month] = {};
+                        pattern[year][month][day] = team;
+                        
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                    
+                    // Avança 6 dias trabalhados
+                    currentDate.setDate(currentDate.getDate() + 6);
+                }
+                
+                return pattern;
+            }
+
+            const daysOff = generateDaysOffPattern();
 
             // Gerar calendário
             function generateCalendar() {
                 const container = document.getElementById('calendar-container');
-                const months = [
-                    {year: 2025, month: 7, name: 'Julho'},
-                    {year: 2025, month: 8, name: 'Agosto'},
-                    {year: 2025, month: 9, name: 'Setembro'}
-                    // Adicione mais meses conforme necessário
-                ];
+                const months = [];
+                
+                // Adiciona todos os meses de julho/2025 a dezembro/2026
+                for (let year = 2025; year <= 2026; year++) {
+                    const startMonth = year === 2025 ? 7 : 1;
+                    const endMonth = year === 2026 ? 12 : 12;
+                    
+                    for (let month = startMonth; month <= endMonth; month++) {
+                        months.push({
+                            year: year,
+                            month: month,
+                            name: new Date(year, month - 1, 1).toLocaleString('pt-BR', { month: 'long' })
+                        });
+                    }
+                }
 
                 months.forEach(m => {
                     const monthEl = document.createElement('div');
                     monthEl.className = 'month-container';
+                    monthEl.dataset.year = m.year;
+                    monthEl.dataset.month = m.month.toString().padStart(2, '0');
                     
                     // Cabeçalho do mês
                     const header = document.createElement('h2');
-                    header.textContent = `${m.name} ${m.year}`;
+                    header.textContent = `${m.name.charAt(0).toUpperCase() + m.name.slice(1)} ${m.year}`;
                     monthEl.appendChild(header);
                     
                     // Dias da semana
@@ -254,10 +326,11 @@
                     }
                     
                     // Dias do mês
-                    const monthKey = `${m.year}-${m.month.toString().padStart(2, '0')}`;
+                    const monthKey = m.month.toString().padStart(2, '0');
                     for (let day = 1; day <= totalDays; day++) {
                         const dayEl = document.createElement('div');
                         dayEl.className = 'calendar-day';
+                        dayEl.dataset.day = day;
                         
                         const dayNumber = document.createElement('div');
                         dayNumber.className = 'day-number';
@@ -265,12 +338,13 @@
                         dayEl.appendChild(dayNumber);
                         
                         // Verificar se é folga
-                        if (daysOff[monthKey] && daysOff[monthKey][day]) {
-                            const team = daysOff[monthKey][day];
+                        if (daysOff[m.year] && daysOff[m.year][monthKey] && daysOff[m.year][monthKey][day]) {
+                            const team = daysOff[m.year][monthKey][day];
                             const teamLabel = document.createElement('div');
                             teamLabel.className = `team-label ${team}`;
                             teamLabel.textContent = team.toUpperCase();
                             dayEl.appendChild(teamLabel);
+                            dayEl.dataset.team = team;
                         }
                         
                         grid.appendChild(dayEl);
@@ -279,7 +353,7 @@
                     monthEl.appendChild(grid);
                     
                     // Adicionar feriados do mês
-                    const monthHolidays = holidays[m.year] && holidays[m.year][m.month.toString().padStart(2, '0')];
+                    const monthHolidays = holidays[m.year] && holidays[m.year][monthKey];
                     if (monthHolidays && monthHolidays.length > 0) {
                         const holidaysSection = document.createElement('div');
                         holidaysSection.className = 'holidays-section';
@@ -291,7 +365,7 @@
                         monthHolidays.forEach(holiday => {
                             const holidayEl = document.createElement('div');
                             holidayEl.className = 'holiday-item';
-                            holidayEl.textContent = `${holiday.day}/${m.month.toString().padStart(2, '0')} - ${holiday.name}`;
+                            holidayEl.textContent = `${holiday.day.toString().padStart(2, '0')}/${monthKey} - ${holiday.name}`;
                             holidaysSection.appendChild(holidayEl);
                         });
                         
@@ -302,7 +376,44 @@
                 });
             }
 
+            // Filtros
+            function setupFilters() {
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Ativa o botão clicado
+                        filterButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Obtém o filtro selecionado
+                        const filter = this.id.replace('-btn', '');
+                        
+                        // Aplica o filtro
+                        applyFilter(filter);
+                    });
+                });
+            }
+            
+            function applyFilter(filter) {
+                const allDays = document.querySelectorAll('.calendar-day');
+                
+                allDays.forEach(day => {
+                    if (filter === 'all') {
+                        day.classList.remove('hidden');
+                    } else {
+                        if (day.dataset.team === filter) {
+                            day.classList.remove('hidden');
+                        } else {
+                            day.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+
+            // Inicializa o calendário
             generateCalendar();
+            setupFilters();
         });
     </script>
 </body>
