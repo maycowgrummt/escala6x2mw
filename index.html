@@ -472,34 +472,39 @@
                 const teams = ['verde', 'azul', 'amarelo', 'vermelho'];
                 const endYear = 2026;
                 
+                // Dias de folga iniciais para cada equipe
+                const initialDays = {
+                    verde: new Date('2025-07-25'),
+                    azul: new Date('2025-07-27'),
+                    amarelo: new Date('2025-07-29'),
+                    vermelho: new Date('2025-07-31')
+                };
+                
                 teams.forEach(team => {
-                    // Começar a partir da última data conhecida
-                    let lastDateStr = allDaysOff[team][allDaysOff[team].length - 1];
-                    let lastDate = new Date(lastDateStr);
+                    // Começar a partir da data inicial de cada equipe
+                    let lastDate = new Date(initialDays[team]);
                     
                     // Padrão de folgas: 6 dias trabalhados + 2 folgas
                     const daysBetween = 8; // 6 trabalhados + 2 folgas
                     
                     // Continuar até o final de 2026
                     while (lastDate.getFullYear() <= endYear) {
-                        // Adicionar 8 dias para obter a próxima folga (6 trabalhados + 2 folgas)
+                        // Adicionar a data atual como folga
+                        let dateStr = formatDate(lastDate);
+                        if (!allDaysOff[team].includes(dateStr)) {
+                            allDaysOff[team].push(dateStr);
+                        }
+                        
+                        // Adicionar o próximo dia como folga também (2 dias consecutivos)
                         let nextDate = new Date(lastDate);
-                        nextDate.setDate(nextDate.getDate() + daysBetween);
-                        
-                        // Verificar se ultrapassou o ano limite
-                        if (nextDate.getFullYear() > endYear) break;
-                        
-                        // Adicionar 2 dias de folga (o dia calculado e o seguinte)
+                        nextDate.setDate(nextDate.getDate() + 1);
                         let nextDateStr = formatDate(nextDate);
-                        allDaysOff[team].push(nextDateStr);
+                        if (!allDaysOff[team].includes(nextDateStr)) {
+                            allDaysOff[team].push(nextDateStr);
+                        }
                         
-                        let nextDate2 = new Date(nextDate);
-                        nextDate2.setDate(nextDate2.getDate() + 1);
-                        let nextDateStr2 = formatDate(nextDate2);
-                        allDaysOff[team].push(nextDateStr2);
-                        
-                        // Atualizar a última data para a próxima iteração
-                        lastDate = new Date(nextDate2);
+                        // Avançar 8 dias (6 trabalhados + 2 folgas) para a próxima folga
+                        lastDate.setDate(lastDate.getDate() + daysBetween);
                     }
                 });
             }
@@ -555,6 +560,8 @@
                         // Criar mês no calendário
                         const monthEl = document.createElement('div');
                         monthEl.className = 'month';
+                        monthEl.dataset.year = year;
+                        monthEl.dataset.month = month;
                         monthEl.innerHTML = `<h2 class="month-title">${capitalizedMonthName} ${year}</h2><div class="days" id="days-${year}-${month}"></div>`;
                         
                         const daysEl = monthEl.querySelector('.days');
@@ -600,11 +607,13 @@
                                 dayEl.setAttribute('title', holidayName);
                             }
                             
-                            // Adicionar classes de folga
-                            teamsOff.forEach(team => {
-                                dayEl.classList.add(team);
-                                dayEl.classList.add('day-off');
-                            });
+                            // Adicionar classes de folga (prioridade para feriados se for o caso)
+                            if (teamsOff.length > 0 && !holidayName) {
+                                teamsOff.forEach(team => {
+                                    dayEl.classList.add(team);
+                                    dayEl.classList.add('day-off');
+                                });
+                            }
                             
                             dayEl.innerHTML = `
                                 <div class="weekday">${weekday}</div>
