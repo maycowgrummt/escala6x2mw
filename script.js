@@ -1,126 +1,78 @@
-const equipeFolgaInicial = {
-  verde: new Date(2025, 6, 25),     // Julho = 6 em JS
-  azul: new Date(2025, 6, 27),
-  amarela: new Date(2025, 6, 29),
-  vermelha: new Date(2025, 6, 31),
+const folgas = {
+  verde: [
+    "2025-07-25", "2025-07-26", "2025-08-03", "2025-08-04",
+    "2025-08-11", "2025-08-12", "2025-08-19", "2025-08-20",
+    "2025-08-27", "2025-08-28", "2025-09-04", "2025-09-05",
+    "2025-09-12", "2025-09-13", "2025-09-20", "2025-09-21",
+    "2025-09-28", "2025-09-29", "2025-10-06", "2025-10-07",
+    "2025-10-14", "2025-10-15", "2025-10-22", "2025-10-23",
+    "2025-10-30", "2025-10-31", "2025-11-07", "2025-11-08",
+    "2025-11-15", "2025-11-16", "2025-11-23", "2025-11-24",
+    "2025-12-01", "2025-12-02", "2025-12-09", "2025-12-10",
+    "2025-12-17", "2025-12-18", "2025-12-25", "2025-12-26",
+    "2026-01-02", "2026-01-03", "2026-01-10", "2026-01-11",
+    "2026-01-18", "2026-01-19", "2026-01-26", "2026-01-27",
+    "2026-02-03", "2026-02-04", "2026-02-11", "2026-02-12",
+    "2026-02-19", "2026-02-20", "2026-02-27", "2026-02-28",
+    "2026-03-07", "2026-03-08", "2026-03-15", "2026-03-16",
+    "2026-03-23", "2026-03-24", "2026-03-31", "2026-04-01",
+    "2026-04-08", "2026-04-09", "2026-04-16", "2026-04-17",
+    "2026-04-24", "2026-04-25", "2026-05-02", "2026-05-03",
+    "2026-05-10", "2026-05-11", "2026-05-18", "2026-05-19",
+    "2026-05-26", "2026-05-27", "2026-06-03", "2026-06-04",
+    "2026-06-11", "2026-06-12", "2026-06-19", "2026-06-20",
+    "2026-06-27", "2026-06-28", "2026-07-05", "2026-07-06",
+    "2026-07-13", "2026-07-14", "2026-07-21", "2026-07-22",
+    "2026-07-29", "2026-07-30", "2026-08-06", "2026-08-07",
+    "2026-08-14", "2026-08-15", "2026-08-22", "2026-08-23",
+    "2026-08-30", "2026-08-31", "2026-09-07", "2026-09-08",
+    "2026-09-15", "2026-09-16", "2026-09-23", "2026-09-24",
+    "2026-10-01", "2026-10-02", "2026-10-09", "2026-10-10",
+    "2026-10-17", "2026-10-18", "2026-10-25", "2026-10-26",
+    "2026-11-02", "2026-11-03", "2026-11-10", "2026-11-11",
+    "2026-11-18", "2026-11-19", "2026-11-26", "2026-11-27",
+    "2026-12-04", "2026-12-05", "2026-12-12", "2026-12-13",
+    "2026-12-20", "2026-12-21", "2026-12-28", "2026-12-29"
+  ],
+  azul: [],
+  amarela: [],
+  vermelha: []
 };
 
-const cicloDias = 8;  // 6 dias trabalho + 2 dias folga
-const folgaDuracao = 2; // 2 dias de folga
+const calendarEl = document.getElementById("calendar");
+const startYear = 2025;
+const endYear = 2026;
 
-const equipeSelect = document.getElementById('equipe');
-const mesAnoDisplay = document.getElementById('mes-ano');
-const corpoCalendario = document.getElementById('corpo-calendario');
-const btnPrev = document.getElementById('btn-prev');
-const btnNext = document.getElementById('btn-next');
+for (let year = startYear; year <= endYear; year++) {
+  for (let month = 0; month < 12; month++) {
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "month";
+    const monthName = new Date(year, month).toLocaleString("default", { month: "long" });
+    monthDiv.innerHTML = `<h2>${monthName.toUpperCase()} ${year}</h2>`;
 
-let dataAtual = new Date();
-let anoAtual = dataAtual.getFullYear();
-let mesAtual = dataAtual.getMonth();
+    const daysDiv = document.createElement("div");
+    daysDiv.className = "days";
 
-function diasNoMes(ano, mes) {
-  return new Date(ano, mes + 1, 0).getDate();
-}
+    const totalDays = new Date(year, month + 1, 0).getDate();
 
-function primeiraSemanaDia(ano, mes) {
-  return new Date(ano, mes, 1).getDay();
-}
+    for (let day = 1; day <= totalDays; day++) {
+      const date = new Date(year, month, day);
+      const dateStr = date.toISOString().split("T")[0];
 
-function getClasseFolga(equipe, dia) {
-  // Retorna a classe CSS da folga para a equipe no dia, ou null se não for folga
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+      dayDiv.innerText = day;
 
-  const folgaInicial = equipeFolgaInicial[equipe];
-  if (!folgaInicial) return null;
+      for (const cor in folgas) {
+        if (folgas[cor].includes(dateStr)) {
+          dayDiv.classList.add(`feriado-${cor}`);
+        }
+      }
 
-  const diaData = new Date(dia.getFullYear(), dia.getMonth(), dia.getDate());
-  const diffTempo = diaData - folgaInicial;
-  const diffDias = Math.floor(diffTempo / (1000 * 60 * 60 * 24));
-
-  if (diffDias < 0) return null;
-
-  const posCiclo = diffDias % cicloDias;
-
-  if (posCiclo >= 0 && posCiclo < folgaDuracao) {
-    // É folga, retorna a classe correta
-    switch (equipe) {
-      case 'verde': return 'folga-verde';
-      case 'azul': return 'folga-azul';
-      case 'amarela': return 'folga-amarela';
-      case 'vermelha': return 'folga-vermelha';
-      default: return null;
-    }
-  }
-
-  return null;
-}
-
-function gerarCalendario(ano, mes, equipe) {
-  corpoCalendario.innerHTML = '';
-
-  const totalDias = diasNoMes(ano, mes);
-  const inicioSemana = primeiraSemanaDia(ano, mes);
-
-  let linha = document.createElement('tr');
-
-  // Preenche os primeiros dias vazios da semana
-  for (let i = 0; i < inicioSemana; i++) {
-    const td = document.createElement('td');
-    linha.appendChild(td);
-  }
-
-  for (let dia = 1; dia <= totalDias; dia++) {
-    if (linha.children.length === 7) {
-      corpoCalendario.appendChild(linha);
-      linha = document.createElement('tr');
+      daysDiv.appendChild(dayDiv);
     }
 
-    const td = document.createElement('td');
-    const dataDia = new Date(ano, mes, dia);
-
-    td.textContent = dia;
-
-    const classeFolga = getClasseFolga(equipe, dataDia);
-    if (classeFolga) {
-      td.classList.add(classeFolga);
-      td.title = 'Folga';
-    }
-
-    linha.appendChild(td);
+    monthDiv.appendChild(daysDiv);
+    calendarEl.appendChild(monthDiv);
   }
-
-  // Completa a última linha com células vazias se necessário
-  while (linha.children.length < 7) {
-    const td = document.createElement('td');
-    linha.appendChild(td);
-  }
-  corpoCalendario.appendChild(linha);
-
-  // Atualiza título mês/ano
-  const opcoesData = { month: 'long', year: 'numeric' };
-  mesAnoDisplay.textContent = new Intl.DateTimeFormat('pt-BR', opcoesData).format(new Date(ano, mes));
 }
-
-equipeSelect.addEventListener('change', () => {
-  gerarCalendario(anoAtual, mesAtual, equipeSelect.value);
-});
-
-btnPrev.addEventListener('click', () => {
-  mesAtual--;
-  if (mesAtual < 0) {
-    mesAtual = 11;
-    anoAtual--;
-  }
-  gerarCalendario(anoAtual, mesAtual, equipeSelect.value);
-});
-
-btnNext.addEventListener('click', () => {
-  mesAtual++;
-  if (mesAtual > 11) {
-    mesAtual = 0;
-    anoAtual++;
-  }
-  gerarCalendario(anoAtual, mesAtual, equipeSelect.value);
-});
-
-// Inicializa
-gerarCalendario(anoAtual, mesAtual, equipeSelect.value);
