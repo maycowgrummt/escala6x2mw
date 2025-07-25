@@ -1,16 +1,398 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendário de Folgas 6x2</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folgas das Equipes 2025-2026</title>
+    <style>
+        :root {
+            --verde: #4CAF50;
+            --azul: #2196F3;
+            --amarelo: #FFEB3B;
+            --vermelho: #F44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        #today {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .team-btn {
+            color: white;
+        }
+        
+        #verde-btn { background-color: var(--verde); }
+        #azul-btn { background-color: var(--azul); }
+        #amarelo-btn { background-color: #FFA000; }
+        #vermelho-btn { background-color: var(--vermelho); }
+        #all-btn { background-color: #9C27B0; color: white; }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .month {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .month-title {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .day {
+            padding: 8px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .day-number {
+            font-weight: bold;
+        }
+        
+        .weekday {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .today {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .day-off {
+            color: white;
+            font-weight: bold;
+        }
+        
+        .verde { background-color: var(--verde); }
+        .azul { background-color: var(--azul); }
+        .amarelo { background-color: #FFA000; }
+        .vermelho { background-color: var(--vermelho); }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .month {
+                padding: 10px;
+            }
+            
+            .day {
+                padding: 5px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Calendário de Folgas 6x2 - Todas as Equipes</h1>
-    <div id="calendar"></div>
-  </div>
-  <script src="script.js"></script>
+    <h1>Folgas das Equipes 2025-2026</h1>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #4CAF50;"></div>
+            <span>Equipe Verde</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #2196F3;"></div>
+            <span>Equipe Azul</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FFA000;"></div>
+            <span>Equipe Amarela</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #F44336;"></div>
+            <span>Equipe Vermelha</span>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="today">Hoje</button>
+        <button id="verde-btn" class="team-btn">Verde</button>
+        <button id="azul-btn" class="team-btn">Azul</button>
+        <button id="amarelo-btn" class="team-btn">Amarela</button>
+        <button id="vermelho-btn" class="team-btn">Vermelha</button>
+        <button id="all-btn">Todas</button>
+    </div>
+    
+    <div class="calendar" id="calendar"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dados iniciais das folgas
+            const initialData = {
+                verde: ['2025-07-25', '2025-07-26'],
+                azul: ['2025-07-27', '2025-07-28'],
+                amarelo: ['2025-07-29', '2025-07-30'],
+                vermelho: ['2025-07-31', '2025-08-01']
+            };
+            
+            // Objeto para armazenar todas as folgas
+            let allDaysOff = {
+                verde: [...initialData.verde],
+                azul: [...initialData.azul],
+                amarelo: [...initialData.amarelo],
+                vermelho: [...initialData.vermelho]
+            };
+            
+            // Gerar todas as folgas até o final de 2026
+            generateAllDaysOff();
+            
+            // Elementos do DOM
+            const calendarEl = document.getElementById('calendar');
+            const todayBtn = document.getElementById('today');
+            const verdeBtn = document.getElementById('verde-btn');
+            const azulBtn = document.getElementById('azul-btn');
+            const amareloBtn = document.getElementById('amarelo-btn');
+            const vermelhoBtn = document.getElementById('vermelho-btn');
+            const allBtn = document.getElementById('all-btn');
+            
+            // Estado atual
+            let currentFilter = 'all';
+            
+            // Inicializar o calendário
+            renderCalendar();
+            
+            // Event listeners
+            todayBtn.addEventListener('click', scrollToToday);
+            verdeBtn.addEventListener('click', () => filterByTeam('verde'));
+            azulBtn.addEventListener('click', () => filterByTeam('azul'));
+            amareloBtn.addEventListener('click', () => filterByTeam('amarelo'));
+            vermelhoBtn.addEventListener('click', () => filterByTeam('vermelho'));
+            allBtn.addEventListener('click', () => filterByTeam('all'));
+            
+            // Função para gerar todas as folgas até o final de 2026
+            function generateAllDaysOff() {
+                const teams = ['verde', 'azul', 'amarelo', 'vermelho'];
+                const endYear = 2026;
+                
+                teams.forEach(team => {
+                    // Começar a partir da última data conhecida
+                    let lastDateStr = allDaysOff[team][allDaysOff[team].length - 1];
+                    let lastDate = new Date(lastDateStr);
+                    
+                    // Padrão de folgas: 12 dias após a última folga
+                    const daysBetween = 12;
+                    
+                    // Continuar até o final de 2026
+                    while (lastDate.getFullYear() <= endYear) {
+                        // Adicionar 12 dias para obter a próxima folga
+                        let nextDate = new Date(lastDate);
+                        nextDate.setDate(nextDate.getDate() + daysBetween);
+                        
+                        // Verificar se ultrapassou o ano limite
+                        if (nextDate.getFullYear() > endYear) break;
+                        
+                        // Adicionar 2 dias de folga (o dia calculado e o seguinte)
+                        let nextDateStr = formatDate(nextDate);
+                        allDaysOff[team].push(nextDateStr);
+                        
+                        let nextDate2 = new Date(nextDate);
+                        nextDate2.setDate(nextDate2.getDate() + 1);
+                        let nextDateStr2 = formatDate(nextDate2);
+                        allDaysOff[team].push(nextDateStr2);
+                        
+                        // Atualizar a última data para a próxima iteração
+                        lastDate = new Date(nextDate2);
+                    }
+                });
+            }
+            
+            // Função para renderizar o calendário
+            function renderCalendar(filter = 'all') {
+                calendarEl.innerHTML = '';
+                
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const years = [currentYear, currentYear + 1];
+                
+                years.forEach(year => {
+                    for (let month = 0; month < 12; month++) {
+                        const firstDay = new Date(year, month, 1);
+                        const lastDay = new Date(year, month + 1, 0);
+                        
+                        const monthName = firstDay.toLocaleString('pt-BR', { month: 'long' });
+                        const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                        
+                        const monthEl = document.createElement('div');
+                        monthEl.className = 'month';
+                        monthEl.innerHTML = `<h2 class="month-title">${capitalizedMonthName} ${year}</h2><div class="days" id="days-${year}-${month}"></div>`;
+                        
+                        const daysEl = monthEl.querySelector('.days');
+                        
+                        // Adicionar dias vazios no início se o mês não começar na segunda
+                        const firstDayOfWeek = firstDay.getDay();
+                        const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Ajuste para semana começar na segunda
+                        
+                        for (let i = 0; i < offset; i++) {
+                            const emptyDay = document.createElement('div');
+                            emptyDay.className = 'day empty';
+                            daysEl.appendChild(emptyDay);
+                        }
+                        
+                        // Adicionar os dias do mês
+                        for (let day = 1; day <= lastDay.getDate(); day++) {
+                            const date = new Date(year, month, day);
+                            const dateStr = formatDate(date);
+                            const weekday = date.toLocaleString('pt-BR', { weekday: 'short' });
+                            
+                            const dayEl = document.createElement('div');
+                            dayEl.className = 'day';
+                            dayEl.id = `day-${dateStr}`;
+                            
+                            // Verificar se é hoje
+                            if (date.toDateString() === today.toDateString()) {
+                                dayEl.classList.add('today');
+                            }
+                            
+                            // Verificar folgas
+                            const teamsOff = [];
+                            if (allDaysOff.verde.includes(dateStr)) teamsOff.push('verde');
+                            if (allDaysOff.azul.includes(dateStr)) teamsOff.push('azul');
+                            if (allDaysOff.amarelo.includes(dateStr)) teamsOff.push('amarelo');
+                            if (allDaysOff.vermelho.includes(dateStr)) teamsOff.push('vermelho');
+                            
+                            // Aplicar filtro
+                            let showDay = false;
+                            if (filter === 'all') {
+                                showDay = true;
+                            } else {
+                                showDay = teamsOff.includes(filter);
+                            }
+                            
+                            if (!showDay) {
+                                dayEl.style.display = 'none';
+                            }
+                            
+                            // Adicionar classes de folga
+                            teamsOff.forEach(team => {
+                                dayEl.classList.add(team);
+                                dayEl.classList.add('day-off');
+                            });
+                            
+                            dayEl.innerHTML = `
+                                <div class="weekday">${weekday}</div>
+                                <div class="day-number">${day}</div>
+                            `;
+                            
+                            daysEl.appendChild(dayEl);
+                        }
+                        
+                        calendarEl.appendChild(monthEl);
+                    }
+                });
+            }
+            
+            // Função para filtrar por equipe
+            function filterByTeam(team) {
+                currentFilter = team;
+                renderCalendar(team);
+            }
+            
+            // Função para rolar até o dia atual
+            function scrollToToday() {
+                const today = new Date();
+                const dateStr = formatDate(today);
+                const dayEl = document.getElementById(`day-${dateStr}`);
+                
+                if (dayEl) {
+                    dayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Destaque temporário
+                    dayEl.style.transform = 'scale(1.2)';
+                    dayEl.style.transition = 'transform 0.3s';
+                    setTimeout(() => {
+                        dayEl.style.transform = 'scale(1)';
+                    }, 1000);
+                }
+            }
+            
+            // Função auxiliar para formatar data como YYYY-MM-DD
+            function formatDate(date) {
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+        });
+    </script>
 </body>
 </html>
