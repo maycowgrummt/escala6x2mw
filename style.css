@@ -1,67 +1,89 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  color: #333;
   margin: 0;
-  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+:root {
+  --bg: #f4f4f4;
+  --text: #111;
+  --card-bg: #fff;
+  --border: #ccc;
+
+  --verde: #4caf50;
+  --azul: #2196f3;
+  --amarela: #ffeb3b;
+  --vermelha: #f44336;
+}
+
+.dark-mode {
+  --bg: #1f1f1f;
+  --text: #f4f4f4;
+  --card-bg: #2a2a2a;
+  --border: #444;
 }
 
 .container {
-  max-width: 900px;
-  margin: auto;
-  background: white;
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.month {
-  margin-bottom: 30px;
-}
-
-.month h2 {
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  margin: 0;
-  border-radius: 8px 8px 0 0;
-}
-
-.days {
+#calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
-  text-align: center;
 }
 
 .day {
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--card-bg);
+  text-align: center;
+  transition: transform 0.1s ease;
+  cursor: pointer;
 }
 
-.feriado-verde {
-  background-color: #a6e3a1;
-  font-weight: bold;
+.day:hover {
+  transform: scale(1.05);
 }
 
-.feriado-azul {
-  background-color: #add8e6;
-  font-weight: bold;
+.folga-verde {
+  background-color: var(--verde);
+  color: white;
+}
+.folga-azul {
+  background-color: var(--azul);
+  color: white;
+}
+.folga-amarela {
+  background-color: var(--amarela);
+  color: black;
+}
+.folga-vermelha {
+  background-color: var(--vermelha);
+  color: white;
 }
 
-.feriado-amarela {
-  background-color: #fff8a6;
-  font-weight: bold;
+.toggle-theme {
+  margin: 10px auto;
+  display: block;
+  padding: 10px 15px;
+  background: none;
+  border: 1px solid var(--text);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
 }
 
-.feriado-vermelha {
-  background-color: #f5a6a6;
-  font-weight: bold;
+.toggle-theme:hover {
+  background-color: var(--text);
+  color: var(--bg);
 }
