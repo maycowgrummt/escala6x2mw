@@ -3,417 +3,730 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendário de Folgas 2025-2026</title>
+    <title>Folgas das Equipes e Feriados 2025-2026</title>
     <style>
         :root {
             --verde: #4CAF50;
             --azul: #2196F3;
             --amarelo: #FFA000;
             --vermelho: #F44336;
+            --feriado: #9C27B0;
+            
+            /* Cores modo claro */
             --bg-color: #f9f9f9;
             --text-color: #333;
             --card-bg: #ffffff;
+            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
             --border-color: #eee;
-            --filter-active: #2c3e50;
+            --month-title-color: #2c3e50;
+            --empty-day-color: transparent;
+            --tab-active: #2196F3;
+            --tab-inactive: #e0e0e0;
         }
 
+        /* Modo escuro */
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --card-bg: #2d2d2d;
+            --card-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            --border-color: #444;
+            --month-title-color: #f0f0f0;
+            --empty-day-color: #3a3a3a;
+            --tab-inactive: #444;
+            --tab-active: #64B5F6;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: var(--text-color);
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
             background-color: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
         }
-
-        h1, h2 {
+        
+        h1 {
             text-align: center;
-            color: #2c3e50;
+            color: var(--month-title-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            transition: color 0.3s;
         }
-
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: var(--text-color);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        
         .controls {
             display: flex;
             justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
         }
-
-        .filter-btn {
-            padding: 8px 16px;
+        
+        button {
+            padding: 8px 12px;
             border: none;
-            border-radius: 20px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
+            font-size: 14px;
         }
-
-        .filter-btn.active {
-            background-color: var(--filter-active);
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        #today {
+            background-color: #2c3e50;
             color: white;
         }
-
+        
+        .team-btn {
+            color: white;
+        }
+        
+        #verde-btn { background-color: var(--verde); }
+        #azul-btn { background-color: var(--azul); }
+        #amarelo-btn { background-color: var(--amarelo); }
+        #vermelho-btn { background-color: var(--vermelho); }
+        #feriados-btn { background-color: var(--feriado); color: white; }
         #all-btn { background-color: #607D8B; color: white; }
-        #verde-btn { background-color: var(--verde); color: white; }
-        #azul-btn { background-color: var(--azul); color: white; }
-        #amarelo-btn { background-color: var(--amarelo); color: white; }
-        #vermelho-btn { background-color: var(--vermelho); color: white; }
-
-        .calendar-grid {
+        
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 5px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            background-color: var(--tab-inactive);
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: var(--tab-active);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .calendar-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            padding-bottom: 15px;
+            scrollbar-width: none;
+        }
+        
+        .calendar-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .month {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            min-width: calc(100% - 30px);
+            scroll-snap-align: start;
+        }
+        
+        .month-title {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--month-title-color);
+            transition: color 0.3s, border-color 0.3s;
+        }
+        
+        .days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-bottom: 30px;
+            gap: 4px;
         }
-
-        .calendar-header {
-            font-weight: bold;
+        
+        .day {
+            padding: 6px;
             text-align: center;
-            padding: 10px;
-            background-color: #f0f0f0;
-        }
-
-        .calendar-day {
-            border: 1px solid var(--border-color);
-            min-height: 60px;
-            padding: 5px;
+            border-radius: 6px;
+            font-size: 13px;
             position: relative;
+            min-height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             background-color: var(--card-bg);
+            transition: background-color 0.3s;
         }
-
+        
         .day-number {
             font-weight: bold;
-            margin-bottom: 3px;
         }
-
-        .team-label {
-            font-size: 0.8em;
+        
+        .weekday {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .holiday-name {
+            font-size: 9px;
+            line-height: 1.2;
+            margin-top: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .today {
+            background-color: #2c3e50 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+        
+        .day-off {
             color: white;
-            padding: 2px 5px;
-            border-radius: 3px;
-            margin-top: 3px;
-            display: inline-block;
+            font-weight: bold;
         }
-
+        
         .verde { background-color: var(--verde); }
         .azul { background-color: var(--azul); }
         .amarelo { background-color: var(--amarelo); }
         .vermelho { background-color: var(--vermelho); }
-
-        .holidays-section {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+        .feriado { background-color: var(--feriado); color: white; }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
-
-        .holiday-item {
-            margin-bottom: 8px;
-            padding-left: 10px;
-            border-left: 3px solid #6c757d;
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
         }
-
-        .month-container {
-            margin-bottom: 40px;
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
         }
-
-        .hidden {
-            display: none;
+        
+        .empty {
+            background-color: var(--empty-day-color);
+            visibility: visible;
         }
-
+        
         @media (max-width: 600px) {
-            .calendar-day {
-                min-height: 50px;
-                font-size: 0.9em;
+            h1 {
+                font-size: 1.3rem;
             }
             
             .controls {
                 gap: 5px;
             }
             
-            .filter-btn {
-                padding: 6px 12px;
-                font-size: 0.9em;
+            button {
+                padding: 6px 10px;
+                font-size: 12px;
             }
+            
+            .tab {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .day {
+                min-height: 35px;
+                padding: 4px;
+                font-size: 12px;
+            }
+            
+            .weekday {
+                font-size: 10px;
+            }
+            
+            .holiday-name {
+                font-size: 8px;
+            }
+            
+            .legend {
+                gap: 8px;
+            }
+            
+            .legend-item {
+                font-size: 11px;
+            }
+            
+            .legend-color {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .month {
+            animation: fadeIn 0.3s ease-out;
         }
     </style>
 </head>
 <body>
-    <h1>Calendário de Folgas 2025-2026</h1>
-
+    <div class="header">
+        <h1>Folgas das Equipes e Feriados 2025-2026</h1>
+        <button class="theme-toggle" id="themeToggle">🌓</button>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #4CAF50;"></div>
+            <span>Verde</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #2196F3;"></div>
+            <span>Azul</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FFA000;"></div>
+            <span>Amarela</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #F44336;"></div>
+            <span>Vermelha</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #9C27B0;"></div>
+            <span>Feriado</span>
+        </div>
+    </div>
+    
     <div class="controls">
-        <button id="all-btn" class="filter-btn active">Todas</button>
-        <button id="verde-btn" class="filter-btn">Verde</button>
-        <button id="azul-btn" class="filter-btn">Azul</button>
-        <button id="amarelo-btn" class="filter-btn">Amarela</button>
-        <button id="vermelho-btn" class="filter-btn">Vermelha</button>
+        <button id="today">Hoje</button>
+        <button id="verde-btn" class="team-btn">Verde</button>
+        <button id="azul-btn" class="team-btn">Azul</button>
+        <button id="amarelo-btn" class="team-btn">Amarela</button>
+        <button id="vermelho-btn" class="team-btn">Vermelha</button>
+        <button id="feriados-btn">Feriados</button>
+        <button id="all-btn">Todas</button>
     </div>
-
-    <div id="calendar-container">
-        <!-- Os meses serão gerados dinamicamente via JavaScript -->
-    </div>
-
+    
+    <div class="tabs" id="monthTabs"></div>
+    <div class="calendar-container" id="calendarContainer"></div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Feriados nacionais e de Curitiba
-            const holidays = {
-                '2025': {
-                    '01': [{day: 1, name: 'Confraternização Universal'}],
-                    '03': [
-                        {day: 3, name: 'Carnaval'},
-                        {day: 4, name: 'Carnaval'}
-                    ],
-                    '04': [
-                        {day: 18, name: 'Sexta-feira Santa'},
-                        {day: 21, name: 'Tiradentes'}
-                    ],
-                    '05': [{day: 1, name: 'Dia do Trabalho'}],
-                    '06': [{day: 19, name: 'Corpus Christi'}],
-                    '07': [{day: 8, name: 'Aniversário de Curitiba'}],
-                    '09': [{day: 7, name: 'Independência do Brasil'}],
-                    '10': [{day: 12, name: 'Nossa Senhora Aparecida'}],
-                    '11': [
-                        {day: 2, name: 'Finados'},
-                        {day: 15, name: 'Proclamação da República'},
-                        {day: 20, name: 'Consciência Negra (Curitiba)'}
-                    ],
-                    '12': [
-                        {day: 8, name: 'N.S. da Luz (Curitiba)'},
-                        {day: 25, name: 'Natal'}
-                    ]
-                },
-                '2026': {
-                    '01': [{day: 1, name: 'Confraternização Universal'}],
-                    '02': [
-                        {day: 16, name: 'Carnaval'},
-                        {day: 17, name: 'Carnaval'}
-                    ],
-                    '03': [{day: 29, name: 'Sexta-feira Santa'}],
-                    '04': [{day: 21, name: 'Tiradentes'}],
-                    '05': [{day: 1, name: 'Dia do Trabalho'}],
-                    '06': [{day: 4, name: 'Corpus Christi'}],
-                    '07': [{day: 8, name: 'Aniversário de Curitiba'}],
-                    '09': [{day: 7, name: 'Independência do Brasil'}],
-                    '10': [{day: 12, name: 'Nossa Senhora Aparecida'}],
-                    '11': [
-                        {day: 2, name: 'Finados'},
-                        {day: 15, name: 'Proclamação da República'},
-                        {day: 20, name: 'Consciência Negra (Curitiba)'}
-                    ],
-                    '12': [
-                        {day: 8, name: 'N.S. da Luz (Curitiba)'},
-                        {day: 25, name: 'Natal'}
-                    ]
-                }
-            };
-
-            // Gera o padrão de folgas automaticamente
-            function generateDaysOffPattern() {
-                const pattern = {};
-                const startDate = new Date('2025-07-25');
-                const endDate = new Date('2026-12-31');
-                const teams = ['verde', 'azul', 'amarelo', 'vermelho'];
-                let currentTeamIndex = 0;
-                let currentDate = new Date(startDate);
-                
-                // Folgas iniciais pré-definidas
-                const initialFolgas = {
-                    '2025-07-25': 'verde',
-                    '2025-07-26': 'verde',
-                    '2025-07-27': 'azul',
-                    '2025-07-28': 'azul',
-                    '2025-07-29': 'amarelo',
-                    '2025-07-30': 'amarelo',
-                    '2025-07-31': 'vermelho',
-                    '2025-08-01': 'vermelho'
-                };
-                
-                // Adiciona folgas iniciais
-                Object.keys(initialFolgas).forEach(date => {
-                    const [year, month, day] = date.split('-');
-                    if (!pattern[year]) pattern[year] = {};
-                    if (!pattern[year][month]) pattern[year][month] = {};
-                    pattern[year][month][parseInt(day)] = initialFolgas[date];
-                });
-                
-                currentDate = new Date('2025-08-02');
-                
-                // Gera o padrão cíclico
-                while (currentDate <= endDate) {
-                    currentTeamIndex = (currentTeamIndex + 1) % teams.length;
-                    const team = teams[currentTeamIndex];
-                    
-                    // Adiciona 2 dias de folga
-                    for (let i = 0; i < 2; i++) {
-                        const year = currentDate.getFullYear();
-                        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                        const day = currentDate.getDate();
-                        
-                        if (!pattern[year]) pattern[year] = {};
-                        if (!pattern[year][month]) pattern[year][month] = {};
-                        pattern[year][month][day] = team;
-                        
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-                    
-                    // Avança 6 dias trabalhados
-                    currentDate.setDate(currentDate.getDate() + 6);
-                }
-                
-                return pattern;
+            // Verificar preferência de tema do usuário
+            const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDarkMode) {
+                document.body.classList.add('dark-mode');
             }
-
-            const daysOff = generateDaysOffPattern();
-
-            // Gerar calendário
-            function generateCalendar() {
-                const container = document.getElementById('calendar-container');
-                const months = [];
+            
+            // Ordem das equipes: Vermelho → Verde → Azul → Amarelo → Vermelho...
+            const teamOrder = ['vermelho', 'verde', 'azul', 'amarelo'];
+            
+            // Datas iniciais de folga conforme especificado
+            const initialDays = {
+                vermelho: ['2025-07-31', '2025-08-01'], // Vermelho: 31/07 e 01/08
+                verde: ['2025-08-02', '2025-08-03'],    // Verde: 02/08 e 03/08
+                azul: ['2025-08-04', '2025-08-05'],     // Azul: 04/08 e 05/08
+                amarelo: ['2025-08-06', '2025-08-07']    // Amarelo: 06/08 e 07/08
+            };
+            
+            // Feriados nacionais brasileiros (2025-2026)
+            const holidays = {
+                '2025-01-01': 'Confraternização Universal',
+                '2025-03-03': 'Carnaval',
+                '2025-03-04': 'Carnaval',
+                '2025-04-18': 'Sexta-feira Santa',
+                '2025-04-21': 'Tiradentes',
+                '2025-05-01': 'Dia do Trabalho',
+                '2025-06-19': 'Corpus Christi',
+                '2025-09-07': 'Independência do Brasil',
+                '2025-10-12': 'Nossa Senhora Aparecida',
+                '2025-11-02': 'Finados',
+                '2025-11-15': 'Proclamação da República',
+                '2025-12-25': 'Natal',
                 
-                // Adiciona todos os meses de julho/2025 a dezembro/2026
-                for (let year = 2025; year <= 2026; year++) {
-                    const startMonth = year === 2025 ? 7 : 1;
-                    const endMonth = year === 2026 ? 12 : 12;
+                '2026-01-01': 'Confraternização Universal',
+                '2026-02-16': 'Carnaval',
+                '2026-02-17': 'Carnaval',
+                '2026-04-03': 'Sexta-feira Santa',
+                '2026-04-21': 'Tiradentes',
+                '2026-05-01': 'Dia do Trabalho',
+                '2026-06-04': 'Corpus Christi',
+                '2026-09-07': 'Independência do Brasil',
+                '2026-10-12': 'Nossa Senhora Aparecida',
+                '2026-11-02': 'Finados',
+                '2026-11-15': 'Proclamação da República',
+                '2026-12-25': 'Natal'
+            };
+            
+            // Objeto para armazenar todas as folgas
+            let allDaysOff = {
+                vermelho: [...initialDays.vermelho],
+                verde: [...initialDays.verde],
+                azul: [...initialDays.azul],
+                amarelo: [...initialDays.amarelo],
+                feriados: Object.keys(holidays)
+            };
+            
+            // Gerar todas as folgas até o final de 2026 seguindo o padrão correto
+            generateAllDaysOff();
+            
+            // Elementos do DOM
+            const calendarContainer = document.getElementById('calendarContainer');
+            const monthTabs = document.getElementById('monthTabs');
+            const themeToggle = document.getElementById('themeToggle');
+            const todayBtn = document.getElementById('today');
+            const verdeBtn = document.getElementById('verde-btn');
+            const azulBtn = document.getElementById('azul-btn');
+            const amareloBtn = document.getElementById('amarelo-btn');
+            const vermelhoBtn = document.getElementById('vermelho-btn');
+            const feriadosBtn = document.getElementById('feriados-btn');
+            const allBtn = document.getElementById('all-btn');
+            
+            // Estado atual
+            let currentFilter = 'all';
+            let currentMonthIndex = 0;
+            let months = [];
+            
+            // Inicializar o calendário
+            initCalendar();
+            
+            // Event listeners
+            themeToggle.addEventListener('click', toggleTheme);
+            todayBtn.addEventListener('click', scrollToToday);
+            verdeBtn.addEventListener('click', () => filterByTeam('verde'));
+            azulBtn.addEventListener('click', () => filterByTeam('azul'));
+            amareloBtn.addEventListener('click', () => filterByTeam('amarelo'));
+            vermelhoBtn.addEventListener('click', () => filterByTeam('vermelho'));
+            feriadosBtn.addEventListener('click', () => filterByTeam('feriados'));
+            allBtn.addEventListener('click', () => filterByTeam('all'));
+            
+            // Função para alternar entre temas
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                themeToggle.textContent = isDark ? '🌞' : '🌓';
+                
+                // Salvar preferência no localStorage
+                localStorage.setItem('darkMode', isDark);
+            }
+            
+            // Verificar tema salvo
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '🌞';
+            }
+            
+            // Função para gerar todas as folgas até o final de 2026 com o padrão correto
+            function generateAllDaysOff() {
+                const endYear = 2026;
+                let currentTeamIndex = 3; // Começa após o Amarelo (índice 3), próxima será Vermelho (0)
+                let lastDate = new Date('2025-08-07'); // Última folga inicial (Amarelo)
+                
+                // Padrão: 6 dias trabalhados + 2 folgas
+                const daysBetween = 8; // 6 trabalhados + 2 folgas
+                
+                // Continuar até o final de 2026
+                while (lastDate.getFullYear() <= endYear) {
+                    // Avançar 6 dias trabalhados para a próxima folga
+                    let nextFolgaStart = new Date(lastDate);
+                    nextFolgaStart.setDate(nextFolgaStart.getDate() + daysBetween - 2);
                     
-                    for (let month = startMonth; month <= endMonth; month++) {
-                        months.push({
-                            year: year,
-                            month: month,
-                            name: new Date(year, month - 1, 1).toLocaleString('pt-BR', { month: 'long' })
-                        });
+                    // Verificar se ultrapassou o ano limite
+                    if (nextFolgaStart.getFullYear() > endYear) break;
+                    
+                    // Determinar a próxima equipe de folga (ciclo Vermelho → Verde → Azul → Amarelo)
+                    currentTeamIndex = (currentTeamIndex + 1) % teamOrder.length;
+                    const nextTeam = teamOrder[currentTeamIndex];
+                    
+                    // Adicionar 2 dias de folga para a equipe
+                    let folga1 = formatDate(nextFolgaStart);
+                    let folga2 = formatDate(new Date(nextFolgaStart.getTime() + 24 * 60 * 60 * 1000));
+                    
+                    if (!allDaysOff[nextTeam].includes(folga1)) {
+                        allDaysOff[nextTeam].push(folga1);
                     }
+                    if (!allDaysOff[nextTeam].includes(folga2)) {
+                        allDaysOff[nextTeam].push(folga2);
+                    }
+                    
+                    // Atualizar a última data para a próxima iteração
+                    lastDate = new Date(nextFolgaStart.getTime() + 24 * 60 * 60 * 1000);
                 }
-
-                months.forEach(m => {
-                    const monthEl = document.createElement('div');
-                    monthEl.className = 'month-container';
-                    monthEl.dataset.year = m.year;
-                    monthEl.dataset.month = m.month.toString().padStart(2, '0');
+            }
+            
+            // Função para inicializar o calendário
+            function initCalendar() {
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const currentMonth = today.getMonth();
+                const years = [currentYear, currentYear + 1];
+                
+                // Limpar containers
+                monthTabs.innerHTML = '';
+                calendarContainer.innerHTML = '';
+                months = [];
+                
+                // Criar abas e meses
+                years.forEach(year => {
+                    // Começar do mês atual se for o ano corrente
+                    const startMonth = (year === currentYear) ? currentMonth : 0;
                     
-                    // Cabeçalho do mês
-                    const header = document.createElement('h2');
-                    header.textContent = `${m.name.charAt(0).toUpperCase() + m.name.slice(1)} ${m.year}`;
-                    monthEl.appendChild(header);
-                    
-                    // Dias da semana
-                    const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-                    const grid = document.createElement('div');
-                    grid.className = 'calendar-grid';
-                    
-                    weekdays.forEach(day => {
-                        const dayEl = document.createElement('div');
-                        dayEl.className = 'calendar-header';
-                        dayEl.textContent = day;
-                        grid.appendChild(dayEl);
-                    });
-                    
-                    // Dias do mês
-                    const firstDay = new Date(m.year, m.month - 1, 1);
-                    const lastDay = new Date(m.year, m.month, 0);
-                    const startDay = firstDay.getDay();
-                    const totalDays = lastDay.getDate();
-                    
-                    // Dias vazios no início
-                    for (let i = 0; i < startDay; i++) {
-                        const emptyDay = document.createElement('div');
-                        emptyDay.className = 'calendar-day';
-                        grid.appendChild(emptyDay);
-                    }
-                    
-                    // Dias do mês
-                    const monthKey = m.month.toString().padStart(2, '0');
-                    for (let day = 1; day <= totalDays; day++) {
-                        const dayEl = document.createElement('div');
-                        dayEl.className = 'calendar-day';
-                        dayEl.dataset.day = day;
+                    for (let month = startMonth; month < 12; month++) {
+                        const date = new Date(year, month, 1);
+                        const monthName = date.toLocaleString('pt-BR', { month: 'long' });
+                        const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                        const tabName = `${capitalizedMonthName} ${year}`;
                         
-                        const dayNumber = document.createElement('div');
-                        dayNumber.className = 'day-number';
-                        dayNumber.textContent = day;
-                        dayEl.appendChild(dayNumber);
+                        // Criar aba
+                        const tab = document.createElement('div');
+                        tab.className = 'tab';
+                        tab.textContent = tabName;
+                        tab.dataset.year = year;
+                        tab.dataset.month = month;
                         
-                        // Verificar se é folga
-                        if (daysOff[m.year] && daysOff[m.year][monthKey] && daysOff[m.year][monthKey][day]) {
-                            const team = daysOff[m.year][monthKey][day];
-                            const teamLabel = document.createElement('div');
-                            teamLabel.className = `team-label ${team}`;
-                            teamLabel.textContent = team.toUpperCase();
-                            dayEl.appendChild(teamLabel);
-                            dayEl.dataset.team = team;
+                        // Marcar aba atual como ativa
+                        if (year === currentYear && month === currentMonth) {
+                            tab.classList.add('active');
+                            currentMonthIndex = months.length;
                         }
                         
-                        grid.appendChild(dayEl);
-                    }
-                    
-                    monthEl.appendChild(grid);
-                    
-                    // Adicionar feriados do mês
-                    const monthHolidays = holidays[m.year] && holidays[m.year][monthKey];
-                    if (monthHolidays && monthHolidays.length > 0) {
-                        const holidaysSection = document.createElement('div');
-                        holidaysSection.className = 'holidays-section';
-                        
-                        const holidaysTitle = document.createElement('h3');
-                        holidaysTitle.textContent = 'Feriados deste mês:';
-                        holidaysSection.appendChild(holidaysTitle);
-                        
-                        monthHolidays.forEach(holiday => {
-                            const holidayEl = document.createElement('div');
-                            holidayEl.className = 'holiday-item';
-                            holidayEl.textContent = `${holiday.day.toString().padStart(2, '0')}/${monthKey} - ${holiday.name}`;
-                            holidaysSection.appendChild(holidayEl);
+                        tab.addEventListener('click', () => {
+                            // Remover classe active de todas as abas
+                            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                            // Adicionar classe active à aba clicada
+                            tab.classList.add('active');
+                            // Rolar para o mês correspondente
+                            scrollToMonth(months.findIndex(m => 
+                                m.year === year && m.month === month));
                         });
                         
-                        monthEl.appendChild(holidaysSection);
+                        monthTabs.appendChild(tab);
+                        
+                        // Criar mês no calendário
+                        const monthEl = document.createElement('div');
+                        monthEl.className = 'month';
+                        monthEl.dataset.year = year;
+                        monthEl.dataset.month = month;
+                        monthEl.innerHTML = `<h2 class="month-title">${capitalizedMonthName} ${year}</h2><div class="days" id="days-${year}-${month}"></div>`;
+                        
+                        const daysEl = monthEl.querySelector('.days');
+                        
+                        // Adicionar dias vazios no início se o mês não começar na segunda
+                        const firstDay = new Date(year, month, 1);
+                        const firstDayOfWeek = firstDay.getDay();
+                        const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1; // Ajuste para semana começar na segunda
+                        
+                        for (let i = 0; i < offset; i++) {
+                            const emptyDay = document.createElement('div');
+                            emptyDay.className = 'day empty';
+                            daysEl.appendChild(emptyDay);
+                        }
+                        
+                        // Adicionar os dias do mês
+                        const lastDay = new Date(year, month + 1, 0);
+                        for (let day = 1; day <= lastDay.getDate(); day++) {
+                            const date = new Date(year, month, day);
+                            const dateStr = formatDate(date);
+                            const weekday = date.toLocaleString('pt-BR', { weekday: 'short' });
+                            
+                            const dayEl = document.createElement('div');
+                            dayEl.className = 'day';
+                            dayEl.id = `day-${dateStr}`;
+                            
+                            // Verificar se é hoje
+                            if (date.toDateString() === today.toDateString()) {
+                                dayEl.classList.add('today');
+                            }
+                            
+                            // Verificar folgas
+                            const teamsOff = [];
+                            if (allDaysOff.vermelho.includes(dateStr)) teamsOff.push('vermelho');
+                            if (allDaysOff.verde.includes(dateStr)) teamsOff.push('verde');
+                            if (allDaysOff.azul.includes(dateStr)) teamsOff.push('azul');
+                            if (allDaysOff.amarelo.includes(dateStr)) teamsOff.push('amarelo');
+                            
+                            // Verificar feriados
+                            let holidayName = holidays[dateStr];
+                            if (holidayName) {
+                                dayEl.classList.add('feriado');
+                                dayEl.setAttribute('title', holidayName);
+                            }
+                            
+                            // Adicionar classes de folga (prioridade para feriados se for o caso)
+                            if (teamsOff.length > 0 && !holidayName) {
+                                teamsOff.forEach(team => {
+                                    dayEl.classList.add(team);
+                                    dayEl.classList.add('day-off');
+                                });
+                            }
+                            
+                            dayEl.innerHTML = `
+                                <div class="weekday">${weekday}</div>
+                                <div class="day-number">${day}</div>
+                                ${holidayName ? '<div class="holiday-name">'+holidayName+'</div>' : ''}
+                            `;
+                            
+                            daysEl.appendChild(dayEl);
+                        }
+                        
+                        calendarContainer.appendChild(monthEl);
+                        months.push({ year, month, element: monthEl });
                     }
-                    
-                    container.appendChild(monthEl);
                 });
-            }
-
-            // Filtros
-            function setupFilters() {
-                const filterButtons = document.querySelectorAll('.filter-btn');
                 
-                filterButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        // Ativa o botão clicado
-                        filterButtons.forEach(btn => btn.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Obtém o filtro selecionado
-                        const filter = this.id.replace('-btn', '');
-                        
-                        // Aplica o filtro
-                        applyFilter(filter);
+                // Rolar para o mês atual
+                scrollToMonth(currentMonthIndex);
+                
+                // Configurar observador de interseção para atualizar aba ativa
+                setupIntersectionObserver();
+            }
+            
+            // Configurar observador de interseção para atualizar aba ativa
+            function setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const year = parseInt(entry.target.dataset.year);
+                            const month = parseInt(entry.target.dataset.month);
+                            
+                            // Atualizar aba ativa
+                            document.querySelectorAll('.tab').forEach(tab => {
+                                tab.classList.remove('active');
+                                if (parseInt(tab.dataset.year) === year && 
+                                    parseInt(tab.dataset.month) === month) {
+                                    tab.classList.add('active');
+                                }
+                            });
+                        }
                     });
+                }, { threshold: 0.7 });
+                
+                // Observar todos os meses
+                document.querySelectorAll('.month').forEach(month => {
+                    observer.observe(month);
                 });
             }
             
-            function applyFilter(filter) {
-                const allDays = document.querySelectorAll('.calendar-day');
+            // Função para filtrar por equipe
+            function filterByTeam(team) {
+                currentFilter = team;
                 
-                allDays.forEach(day => {
-                    if (filter === 'all') {
-                        day.classList.remove('hidden');
+                // Esconder/mostrar dias conforme o filtro
+                document.querySelectorAll('.day').forEach(day => {
+                    if (day.classList.contains('empty')) return;
+                    
+                    const hasTeam = day.classList.contains(team);
+                    const isHoliday = day.classList.contains('feriado');
+                    
+                    if (team === 'all') {
+                        day.style.display = 'flex';
+                    } else if (team === 'feriados') {
+                        day.style.display = isHoliday ? 'flex' : 'none';
                     } else {
-                        if (day.dataset.team === filter) {
-                            day.classList.remove('hidden');
-                        } else {
-                            day.classList.add('hidden');
-                        }
+                        day.style.display = hasTeam ? 'flex' : 'none';
                     }
                 });
             }
-
-            // Inicializa o calendário
-            generateCalendar();
-            setupFilters();
+            
+            // Função para rolar até um mês específico
+            function scrollToMonth(index) {
+                if (index >= 0 && index < months.length) {
+                    months[index].element.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest',
+                        inline: 'center'
+                    });
+                    currentMonthIndex = index;
+                }
+            }
+            
+            // Função para rolar até o dia atual
+            function scrollToToday() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                
+                // Encontrar o índice do mês atual
+                const monthIndex = months.findIndex(m => 
+                    m.year === year && m.month === month);
+                
+                if (monthIndex !== -1) {
+                    scrollToMonth(monthIndex);
+                    
+                    // Destaque do dia atual
+                    const dateStr = formatDate(today);
+                    const dayEl = document.getElementById(`day-${dateStr}`);
+                    
+                    if (dayEl) {
+                        dayEl.style.transform = 'scale(1.1)';
+                        dayEl.style.transition = 'transform 0.3s';
+                        setTimeout(() => {
+                            dayEl.style.transform = 'scale(1)';
+                        }, 1000);
+                    }
+                }
+            }
+            
+            // Função auxiliar para formatar data como YYYY-MM-DD
+            function formatDate(date) {
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
         });
     </script>
 </body>
