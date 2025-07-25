@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escala 6x2 - Folgas por Equipe</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Escala 6x2 - Folgas por Cores</h1>
+
+    <label for="equipe">Selecione sua equipe:</label>
+    <select id="equipe">
+      <option value="verde">Verde</option>
+      <option value="azul">Azul</option>
+      <option value="amarela">Amarela</option>
+      <option value="vermelha">Vermelha</option>
+    </select>
+
+    <div class="navegacao-mes">
+      <button id="btn-prev" aria-label="Mês anterior">‹</button>
+      <div id="mes-ano" aria-live="polite"></div>
+      <button id="btn-next" aria-label="Próximo mês">›</button>
+    </div>
+
+    <table id="calendario" aria-label="Calendário mensal">
+      <thead>
+        <tr>
+          <th>Dom</th>
+          <th>Seg</th>
+          <th>Ter</th>
+          <th>Qua</th>
+          <th>Qui</th>
+          <th>Sex</th>
+          <th>Sáb</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-calendario"></tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
