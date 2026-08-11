@@ -3,36 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folgas das Equipes e Feriados 2025-2027</title>
+    <title>Escala 6x2 - Mondelez</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
         :root {
-            --verde: #4CAF50; --azul: #2196F3; --amarelo: #FFA000; --vermelho: #F44336; --feriado: #9C27B0;
-            --bg-color: #f9f9f9; --text-color: #333; --card-bg: #ffffff;
-            --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            --bg-start: #1a0a2e; /* Roxo escuro */
+            --bg-end: #0a0a0a;   /* Quase preto */
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --verde: #4CAF50; --azul: #2196F3; --amarelo: #FFC107; --vermelho: #F44336; 
+            --feriado: #9C27B0;   /* Roxo para Nacionais */
+            --municipal: #FFFFFF; /* Branco para Municipais de Curitiba */
         }
-        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); padding: 20px; }
-        h1 { text-align: center; }
-        .calendar-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .month { background: var(--card-bg); border-radius: 8px; padding: 15px; width: 260px; box-shadow: var(--card-shadow); }
-        .month h3 { text-align: center; }
-        .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .day { padding: 6px; text-align: center; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .verde { background-color: var(--verde); color: white; }
-        .azul { background-color: var(--azul); color: white; }
-        .amarelo { background-color: var(--amarelo); color: white; }
-        .vermelho { background-color: var(--vermelho); color: white; }
-        .feriado { background-color: var(--feriado); color: white; }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end)); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Estilo do Modal (Pop-up) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, #25103f, #12051f);
+            border: 1px solid rgba(155, 89, 182, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-card h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #9b59b6, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            margin: 15px 0 25px 0;
+            line-height: 1.5;
+        }
+
+        .modal-card p strong {
+            color: #fff;
+            background: linear-gradient(to right, #9b59b6, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #8e44ad, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4);
+            width: 100%;
+        }
+
+        .modal-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Novo Banner de Cabeçalho */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(26, 10, 46, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge {
+            background: rgba(142, 68, 173, 0.3);
+            color: #d7bde2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(142, 68, 173, 0.5);
+        }
+
+        .hero-banner h1 {
+            font-size: 2.8rem;
+            margin: 10px 0 0 0;
+            background: linear-gradient(to right, #ffffff, #b3b3b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .hero-banner h2 {
+            font-size: 1.4rem;
+            margin: 0 0 15px 0;
+            background: linear-gradient(to right, #9b59b6, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .hero-banner p {
+            color: rgba(255,255,255,0.6);
+            margin: 0 0 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .team-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .dot-team {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-team.verde { background-color: var(--verde); box-shadow: 0 0 6px var(--verde); }
+        .dot-team.azul { background-color: var(--azul); box-shadow: 0 0 6px var(--azul); }
+        .dot-team.amarelo { background-color: var(--amarelo); box-shadow: 0 0 6px var(--amarelo); }
+        .dot-team.vermelho { background-color: var(--vermelho); box-shadow: 0 0 6px var(--vermelho); }
+
+        /* Container do Calendário */
+        .calendar-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            width: 100%;
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        .month { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(15px);
+            border-radius: 20px; 
+            padding: 20px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s;
+        }
+
+        .month:hover { transform: translateY(-5px); }
+
+        .month h3 { text-align: center; color: #fff; margin-top: 0; font-size: 1rem; opacity: 0.9; }
+
+        .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 15px; }
+        .day { 
+            padding: 8px 0; 
+            text-align: center; 
+            border-radius: 8px; 
+            font-size: 11px; 
+            font-weight: 600;
+        }
+
+        /* Cores das Equipes e Feriados */
+        .verde { background-color: var(--verde); }
+        .azul { background-color: var(--azul); }
+        .amarelo { background-color: var(--amarelo); color: #000; }
+        .vermelho { background-color: var(--vermelho); }
+        .feriado { background-color: var(--feriado); box-shadow: 0 0 8px var(--feriado); }
+        .municipal { background-color: var(--municipal); color: #000; box-shadow: 0 0 10px rgba(255,255,255,0.5); font-weight: 700; }
+
+        /* Legenda de feriados por mês */
+        .month-holidays {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+            font-size: 11px;
+        }
+        .month-holidays p {
+            margin: 4px 0;
+            color: rgba(255, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-feriado { background-color: var(--feriado); }
+        .dot-municipal { background-color: var(--municipal); }
+
+        /* Rodapé Estilizado */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+        footer span {
+            background: linear-gradient(to right, #9b59b6, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
-    <h1>Escala de Folgas 2025-2027</h1>
+
+    <!-- Pop-up de Atualização -->
+    <div class="modal-overlay" id="updateModal">
+        <div class="modal-card">
+            <h3>Aviso do Sistema</h3>
+            <p>Aplicativo atualizado!<br>Qualquer dúvida contate: <strong>Maycow Grummt</strong></p>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <header class="hero-banner">
+        <span class="badge">Gestão Operacional</span>
+        <h1>Escala 6x2</h1>
+        <h2>Mondelez</h2>
+        <p>Ciclo Operacional, Feriados Nacionais & Municipais (Curitiba)</p>
+        <div class="team-dots">
+            <span class="dot-team verde"></span>
+            <span class="dot-team azul"></span>
+            <span class="dot-team amarelo"></span>
+            <span class="dot-team vermelho"></span>
+        </div>
+    </header>
+
     <div class="calendar-container" id="calendarContainer"></div>
 
+    <footer>
+        WebApp criado por: <span>Maycow Grummt</span> &copy; 2026
+    </footer>
+
     <script>
+        // Função para fechar o pop-up
+        function closeModal() {
+            document.getElementById('updateModal').style.display = 'none';
+        }
+
         const holidays = {
-            '2025-01-01': 'Confraternização', '2025-03-03': 'Carnaval', '2025-03-04': 'Carnaval', '2025-04-18': 'Sexta-feira Santa', '2025-04-21': 'Tiradentes', '2025-05-01': 'Dia do Trabalho', '2025-06-19': 'Corpus Christi', '2025-09-07': 'Independência', '2025-10-12': 'N. S. Aparecida', '2025-11-02': 'Finados', '2025-11-15': 'Proclamação da República', '2025-12-25': 'Natal',
-            '2026-01-01': 'Confraternização', '2026-02-16': 'Carnaval', '2026-02-17': 'Carnaval', '2026-04-03': 'Sexta-feira Santa', '2026-04-21': 'Tiradentes', '2026-05-01': 'Dia do Trabalho', '2026-06-04': 'Corpus Christi', '2026-09-07': 'Independência', '2026-10-12': 'N. S. Aparecida', '2026-11-02': 'Finados', '2026-11-15': 'Proclamação da República', '2026-12-25': 'Natal',
-            '2027-01-01': 'Confraternização', '2027-02-08': 'Carnaval', '2027-02-09': 'Carnaval', '2027-03-26': 'Sexta-feira Santa', '2027-04-21': 'Tiradentes', '2027-05-01': 'Dia do Trabalho', '2027-05-27': 'Corpus Christi', '2027-09-07': 'Independência', '2027-10-12': 'N. S. Aparecida', '2027-11-02': 'Finados', '2027-11-15': 'Proclamação da República', '2027-12-25': 'Natal'
+            '2026-09-07': { name: 'Independência do Brasil', type: 'feriado' },
+            '2026-09-08': { name: 'Nossa Senhora da Luz dos Pinhais (Curitiba)', type: 'municipal' },
+            '2026-10-12': { name: 'Nossa Senhora Aparecida', type: 'feriado' },
+            '2026-11-02': { name: 'Finados', type: 'feriado' },
+            '2026-11-15': { name: 'Proclamação da República', type: 'feriado' },
+            '2026-12-25': { name: 'Natal', type: 'feriado' },
+
+            '2027-01-01': { name: 'Confraternização Universal', type: 'feriado' },
+            '2027-02-08': { name: 'Carnaval', type: 'feriado' },
+            '2027-02-09': { name: 'Carnaval', type: 'feriado' },
+            '2027-03-26': { name: 'Sexta-feira Santa', type: 'feriado' },
+            '2027-03-31': { name: 'Aniversário de Curitiba', type: 'municipal' },
+            '2027-04-21': { name: 'Tiradentes', type: 'feriado' },
+            '2027-05-01': { name: 'Dia do Trabalho', type: 'feriado' },
+            '2027-05-27': { name: 'Corpus Christi', type: 'feriado' },
+            '2027-09-07': { name: 'Independência do Brasil', type: 'feriado' },
+            '2027-09-08': { name: 'Nossa Senhora da Luz dos Pinhais (Curitiba)', type: 'municipal' },
+            '2027-10-12': { name: 'Nossa Senhora Aparecida', type: 'feriado' },
+            '2027-11-02': { name: 'Finados', type: 'feriado' },
+            '2027-11-15': { name: 'Proclamação da República', type: 'feriado' },
+            '2027-12-25': { name: 'Natal', type: 'feriado' }
         };
 
         function getTeamColor(date) {
@@ -44,23 +328,51 @@
         }
 
         const container = document.getElementById('calendarContainer');
-        for (let year = 2025; year <= 2027; year++) {
+        const today = new Date();
+
+        for (let year = 2026; year <= 2027; year++) {
             for (let month = 0; month < 12; month++) {
+                if (year === 2026 && month < today.getMonth()) continue;
+
                 const monthEl = document.createElement('div');
                 monthEl.className = 'month';
-                monthEl.innerHTML = `<h3>${new Date(year, month).toLocaleString('pt-BR', {month: 'long'})} ${year}</h3><div class="days"></div>`;
+                
+                let monthHTML = `<h3>${new Date(year, month).toLocaleString('pt-BR', {month: 'long'})} ${year}</h3><div class="days"></div>`;
+                monthHTML += `<div class="month-holidays" id="holidays-${year}-${month}"></div>`;
+                
+                monthEl.innerHTML = monthHTML;
                 container.appendChild(monthEl);
                 
                 const daysEl = monthEl.querySelector('.days');
+                const holidaysListEl = monthEl.querySelector(`#holidays-${year}-${month}`);
                 const lastDay = new Date(year, month + 1, 0).getDate();
+                
+                let monthHolidaysHTML = '';
+
                 for (let d = 1; d <= lastDay; d++) {
                     const date = new Date(year, month, d);
                     const dateKey = date.toISOString().split('T')[0];
                     const dayEl = document.createElement('div');
-                    dayEl.className = 'day ' + (holidays[dateKey] ? 'feriado' : getTeamColor(date));
+                    
+                    const holidayInfo = holidays[dateKey];
+                    if (holidayInfo) {
+                        dayEl.className = 'day ' + holidayInfo.type;
+                        dayEl.title = holidayInfo.name;
+                        
+                        const dotClass = holidayInfo.type === 'feriado' ? 'dot-feriado' : 'dot-municipal';
+                        monthHolidaysHTML += `<p><span class="dot ${dotClass}"></span> <strong>${d.toString().padStart(2, '0')}:</strong> ${holidayInfo.name}</p>`;
+                    } else {
+                        dayEl.className = 'day ' + getTeamColor(date);
+                    }
+                    
                     dayEl.textContent = d;
-                    dayEl.title = holidays[dateKey] || '';
                     daysEl.appendChild(dayEl);
+                }
+
+                if (monthHolidaysHTML !== '') {
+                    holidaysListEl.innerHTML = monthHolidaysHTML;
+                } else {
+                    holidaysListEl.style.display = 'none';
                 }
             }
         }
